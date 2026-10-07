@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'DotMatrix';
+  src: url('/fonts/DotMatrix.ttf') format('truetype');
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Deco';
+  src: url('/fonts/Deco.ttf') format('truetype');
+  font-display: swap;
+}

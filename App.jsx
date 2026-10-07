@@ -147,6 +147,8 @@ const TEMPLATES = [
     labels: { serialNo: 'Serial No.', party: 'Party', material: 'Material' },
     Preview: BhagwatiPreview,
     Slip: BhagwatiSlip,
+  },
+  {
     id: 'satyanarayan',
     name: 'Shree Satyanarayan Weigh-Bridge (50 Ton)',
     sub: 'Red/Pink slip • Samrat Ind. Area, Gondal Road, Rajkot',

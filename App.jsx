@@ -4,11 +4,21 @@ import AmbikaSlip from './slips/AmbikaSlip.jsx'
 import JaynathSlip from './slips/JaynathSlip.jsx'
 import KrishnaSlip from './slips/KrishnaSlip.jsx'
 import DhartiSlip from './slips/DhartiSlip.jsx'
+import JaySlip from './slips/JaySlip.jsx'
+import MarutiSlip from './slips/MarutiSlip.jsx'
+import HarikrushnaSlip from './slips/HarikrushnaSlip.jsx'
+import ViratSlip from './slips/ViratSlip.jsx'
+import BhagwatiSlip from './slips/BhagwatiSlip.jsx'
 import { mmToPt } from './slips/printSpec.jsx'
 import SlipPreview from './SlipPreview.jsx'
 import JaynathPreview from './JaynathPreview.jsx'
 import KrishnaPreview from './KrishnaPreview.jsx'
 import DhartiPreview from './DhartiPreview.jsx'
+import JayPreview from './JayPreview.jsx'
+import MarutiPreview from './MarutiPreview.jsx'
+import HarikrushnaPreview from './HarikrushnaPreview.jsx'
+import ViratPreview from './ViratPreview.jsx'
+import BhagwatiPreview from './BhagwatiPreview.jsx'
 
 const initialData = {
   serialNo: '',
@@ -84,6 +94,51 @@ const TEMPLATES = [
     labels: { serialNo: 'RST No.', party: 'Receiver', material: 'Material' },
     Preview: DhartiPreview,
     Slip: DhartiSlip,
+  },
+  {
+    id: 'jay',
+    name: 'Jay Weigh Bridge',
+    sub: 'Blue slip • Atika, Patel Chowk, Rajkot',
+    color: '#2b4b94',
+    labels: { serialNo: 'Serial No.', party: 'Supplier', material: 'Product' },
+    Preview: JayPreview,
+    Slip: JaySlip,
+  },
+  {
+    id: 'maruti',
+    name: 'Shree Maruti Weighbridge',
+    sub: 'Green slip • Kothariya, Rajkot',
+    color: '#2f9e4f',
+    labels: { serialNo: 'Serial No.', party: 'Party', material: 'Material' },
+    Preview: MarutiPreview,
+    Slip: MarutiSlip,
+  },
+  {
+    id: 'harikrushna',
+    name: 'Harikrushna Weigh Bridge',
+    sub: 'Blue slip • SIDC Road, Veraval (Shapar), Rajkot',
+    color: '#1f3864',
+    labels: { serialNo: 'Serial No.', party: 'Party', material: 'Material' },
+    Preview: HarikrushnaPreview,
+    Slip: HarikrushnaSlip,
+  },
+  {
+    id: 'virat',
+    name: 'Virat Weigh-Bridge',
+    sub: 'Crimson slip • Mavdi Main Road, Rajkot',
+    color: '#b5245c',
+    labels: { serialNo: 'Serial No.', party: 'Party', material: 'Material' },
+    Preview: ViratPreview,
+    Slip: ViratSlip,
+  },
+  {
+    id: 'bhagwati',
+    name: 'Bhagwati Weigh Bridge',
+    sub: 'Red slip • Kuvadva G.I.D.C., Rajkot',
+    color: '#d42027',
+    labels: { serialNo: 'Serial No.', party: 'Party', material: 'Material' },
+    Preview: BhagwatiPreview,
+    Slip: BhagwatiSlip,
   },
 ]
 

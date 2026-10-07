@@ -1,12 +1,14 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { pdf } from '@react-pdf/renderer'
 import AmbikaSlip from './slips/AmbikaSlip.jsx'
 import JaynathSlip from './slips/JaynathSlip.jsx'
 import KrishnaSlip from './slips/KrishnaSlip.jsx'
+import DhartiSlip from './slips/DhartiSlip.jsx'
 import { mmToPt } from './slips/printSpec.jsx'
 import SlipPreview from './SlipPreview.jsx'
 import JaynathPreview from './JaynathPreview.jsx'
 import KrishnaPreview from './KrishnaPreview.jsx'
+import DhartiPreview from './DhartiPreview.jsx'
 
 const initialData = {
   serialNo: '',
@@ -74,6 +76,15 @@ const TEMPLATES = [
     Preview: KrishnaPreview,
     Slip: KrishnaSlip,
   },
+  {
+    id: 'dharti',
+    name: 'Dharti Weigh Bridge',
+    sub: 'Orange slip • Dhebar Road, Atika, Rajkot',
+    color: '#e2641e',
+    labels: { serialNo: 'RST No.', party: 'Receiver', material: 'Material' },
+    Preview: DhartiPreview,
+    Slip: DhartiSlip,
+  },
 ]
 
 const OFFSETS_KEY = 'slipfiller-offsets'
@@ -86,24 +97,147 @@ function loadOffsets() {
   }
 }
 
-function TemplateCard({ t, active, onSelect }) {
+// Searchable template dropdown. Scales past the handful of slips that fit as
+// stacked cards: matches on name + sub (town/road), so "gondal" or "orange"
+// finds a slip as readily as its company name.
+function TemplateSelect({ templates, value, onSelect }) {
+  const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [active, setActive] = useState(0)
+  const rootRef = useRef(null)
+  const inputRef = useRef(null)
+  const listRef = useRef(null)
+
+  const selected = templates.find((t) => t.id === value)
+
+  const matches = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q) return templates
+    // every term must hit somewhere, so "krishna mavdi" narrows rather than widens
+    const terms = q.split(/\s+/)
+    return templates.filter((t) => {
+      const hay = `${t.name} ${t.sub}`.toLowerCase()
+      return terms.every((term) => hay.includes(term))
+    })
+  }, [templates, query])
+
+  // Close on outside click / Escape
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e) => {
+      if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [open])
+
+  // Focus the search box when the menu opens, and reset for the next open
+  useEffect(() => {
+    if (open) inputRef.current?.focus()
+    else {
+      setQuery('')
+      setActive(0)
+    }
+  }, [open])
+
+  // Keep the highlighted row in view during keyboard nav
+  useEffect(() => {
+    if (!open) return
+    listRef.current?.querySelector('[data-active="true"]')?.scrollIntoView({ block: 'nearest' })
+  }, [active, open])
+
+  // Clamp the highlight when filtering shrinks the list
+  useEffect(() => setActive(0), [query])
+
+  const choose = (t) => {
+    onSelect(t.id)
+    setOpen(false)
+  }
+
+  const onKeyDown = (e) => {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      if (!open) return setOpen(true)
+      if (!matches.length) return
+      const dir = e.key === 'ArrowDown' ? 1 : -1
+      setActive((i) => (i + dir + matches.length) % matches.length)
+    } else if (e.key === 'Enter') {
+      if (open && matches[active]) {
+        e.preventDefault()
+        choose(matches[active])
+      }
+    } else if (e.key === 'Escape') {
+      if (open) {
+        e.preventDefault()
+        setOpen(false)
+      }
+    }
+  }
+
   return (
-    <button
-      onClick={() => onSelect(t.id)}
-      className={`w-full text-left rounded-xl border-2 px-4 py-3 transition shadow-sm bg-white hover:shadow ${
-        active ? 'ring-2' : ''
-      }`}
-      style={{ borderColor: active ? t.color : '#e5e7eb', ...(active ? { boxShadow: `0 0 0 2px ${t.color}22` } : {}) }}
-    >
-      <div className="flex items-center gap-3">
-        <span className="inline-block w-5 h-5 rounded" style={{ backgroundColor: t.color }} />
-        <div>
-          <div className="text-sm font-bold" style={{ color: t.color }}>{t.name}</div>
-          <div className="text-[11px] text-gray-400">{t.sub}</div>
+    <div ref={rootRef} className="relative" onKeyDown={onKeyDown}>
+      {/* Trigger — shows the current slip exactly as the old card did */}
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="w-full text-left rounded-xl border-2 px-3 py-2.5 bg-white shadow-sm hover:shadow transition flex items-center gap-3"
+        style={{ borderColor: selected ? selected.color : '#e5e7eb' }}
+      >
+        <span className="inline-block w-5 h-5 rounded shrink-0" style={{ backgroundColor: selected?.color }} />
+        <span className="min-w-0 flex-1">
+          <span className="block text-sm font-bold truncate" style={{ color: selected?.color }}>
+            {selected?.name || 'Select template'}
+          </span>
+          <span className="block text-[11px] text-gray-400 truncate">{selected?.sub}</span>
+        </span>
+        <span className={`text-gray-400 text-xs shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}>▼</span>
+      </button>
+
+      {open && (
+        <div className="absolute z-30 mt-1 w-full rounded-xl border-2 border-slate-200 bg-white shadow-lg overflow-hidden">
+          <div className="p-2 border-b border-slate-100">
+            <input
+              ref={inputRef}
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search templates…"
+              className="w-full border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-gray-400"
+            />
+          </div>
+
+          <div ref={listRef} role="listbox" className="max-h-72 overflow-y-auto py-1">
+            {matches.map((t, i) => {
+              const isSel = t.id === value
+              return (
+                <button
+                  key={t.id}
+                  type="button"
+                  role="option"
+                  aria-selected={isSel}
+                  data-active={i === active}
+                  onMouseEnter={() => setActive(i)}
+                  onClick={() => choose(t)}
+                  className={`w-full text-left px-3 py-2 flex items-center gap-3 ${i === active ? 'bg-slate-50' : ''}`}
+                >
+                  <span className="inline-block w-4 h-4 rounded shrink-0" style={{ backgroundColor: t.color }} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold truncate" style={{ color: t.color }}>{t.name}</span>
+                    <span className="block text-[11px] text-gray-400 truncate">{t.sub}</span>
+                  </span>
+                  {isSel && <span className="text-xs font-bold shrink-0" style={{ color: t.color }}>✓</span>}
+                </button>
+              )
+            })}
+
+            {!matches.length && (
+              <div className="px-3 py-6 text-center text-xs text-gray-400">No templates match “{query}”</div>
+            )}
+          </div>
         </div>
-        {active && <span className="ml-auto text-xs font-bold" style={{ color: t.color }}>✓ Selected</span>}
-      </div>
-    </button>
+      )}
+    </div>
   )
 }
 
@@ -210,9 +344,7 @@ export default function App() {
         <aside className="hidden md:block w-72 shrink-0 px-4 py-8">
           <div className="sticky top-6 space-y-3">
             <div className="text-xs font-bold text-gray-500 uppercase tracking-wide px-1">Slip Template</div>
-            {TEMPLATES.map((t) => (
-              <TemplateCard key={t.id} t={t} active={t.id === templateId} onSelect={setTemplateId} />
-            ))}
+            <TemplateSelect templates={TEMPLATES} value={templateId} onSelect={setTemplateId} />
 
             {/* Print panel */}
             <div className="bg-white border-2 border-slate-200 rounded-xl p-4 space-y-2">
@@ -265,10 +397,9 @@ export default function App() {
         {/* Main */}
         <main className="flex-1 min-w-0 px-4 py-8 space-y-8">
           {/* Mobile template selector */}
-          <div className="md:hidden grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {TEMPLATES.map((t) => (
-              <TemplateCard key={t.id} t={t} active={t.id === templateId} onSelect={setTemplateId} />
-            ))}
+          <div className="md:hidden">
+            <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2 px-1">Slip Template</div>
+            <TemplateSelect templates={TEMPLATES} value={templateId} onSelect={setTemplateId} />
           </div>
 
           <div className="bg-white border-2 border-slate-200 rounded-2xl p-6 shadow">

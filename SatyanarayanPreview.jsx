@@ -1,5 +1,6 @@
 import React from 'react'
 import SlipScaler from './SlipScaler.jsx'
+import satyanarayanTitle, { satyanarayanTitleAspect } from './satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg (same as JaySatyanarayan)
 const INK = '#982435'          // Deep crimson/maroon press ink sampled from scan
@@ -10,6 +11,8 @@ const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
 const PAGE_W = 850
 const PAGE_H = 458
+
+const TITLE_W = 560
 
 const GUJ = "'Noto Sans Gujarati', sans-serif"
 const SANS = 'Helvetica, Arial, sans-serif'
@@ -99,8 +102,8 @@ export default function SatyanarayanPreview({ data }) {
           }}
         >
           <span style={{ fontSize: 40, fontWeight: 900, color: INK, lineHeight: 1 }}>50</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 3, letterSpacing: 0.6 }}>MATRIC</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
+          <span style={{ fontSize: 11, fontWeight: 900, color: INK, marginTop: 3, letterSpacing: 0.6 }}>MATRIC</span>
+          <span style={{ fontSize: 11, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
         {/* Right Box: 5 MATRIC TON (same background as main background) */}
@@ -122,8 +125,8 @@ export default function SatyanarayanPreview({ data }) {
           }}
         >
           <span style={{ fontSize: 42, fontWeight: 900, color: INK, lineHeight: 1 }}>5</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 2, letterSpacing: 0.6 }}>MATRIC</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
+          <span style={{ fontSize: 11, fontWeight: 900, color: INK, marginTop: 2, letterSpacing: 0.6 }}>MATRIC</span>
+          <span style={{ fontSize: 11, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
         {/* Center Header Details */}
@@ -139,20 +142,16 @@ export default function SatyanarayanPreview({ data }) {
             justifyContent: 'center',
           }}
         >
-          <div
+          <img
+            src={satyanarayanTitle}
+            alt="SHREE SATYANARAYAN WEIGH-BRIDGE"
             style={{
-              fontSize: 21,
-              fontWeight: 900,
-              fontFamily: "'Arial Black', 'Impact', 'Trebuchet MS', 'Helvetica Neue', Arial, sans-serif",
-              color: INK,
-              textAlign: 'center',
-              letterSpacing: 1,
-              whiteSpace: 'nowrap',
-              textTransform: 'uppercase',
+              width: TITLE_W,
+              height: TITLE_W / satyanarayanTitleAspect,
+              display: 'block',
+              objectFit: 'contain',
             }}
-          >
-            SHREE SATYANARAYAN WEIGH-BRIDGE
-          </div>
+          />
           <div
             style={{
               fontSize: 11,
@@ -312,7 +311,7 @@ export default function SatyanarayanPreview({ data }) {
           style={{
             position: 'absolute',
             left: 838,
-            top: 410,
+            top: 438,          // run ends just inside the bottom border (border spans y 12..446)
             fontSize: 7.5,
             fontWeight: 700,
             fontFamily: SANS,

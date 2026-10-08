@@ -1,7 +1,8 @@
 import React from 'react'
-import { Document, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { Document, Text, View, Image, StyleSheet } from '@react-pdf/renderer'
 import '../fonts.js'
 import PrintPage from './printSpec.jsx'
+import satyanarayanTitle, { satyanarayanTitleAspect } from '../satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg scan
 const INK = '#982435'          // Deep crimson red press ink
@@ -12,6 +13,9 @@ const VAL = '#1a1a1a'          // Dark charcoal for values
 
 const PAGE_W = 850
 const PAGE_H = 458
+
+// Rendered width of the title lettering image (height follows its aspect)
+const TITLE_W = 560
 
 const S = StyleSheet.create({
   // Main red border without radius + pink background inside
@@ -52,7 +56,7 @@ const S = StyleSheet.create({
     lineHeight: 1,
   },
   sideMatric: {
-    fontSize: 9.5,
+    fontSize: 11,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -60,7 +64,7 @@ const S = StyleSheet.create({
     letterSpacing: 0.6,
   },
   sideTon: {
-    fontSize: 9.5,
+    fontSize: 11,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -76,12 +80,10 @@ const S = StyleSheet.create({
     width: 630,
     alignItems: 'center',
   },
-  titleText: {
-    fontSize: 21,
-    fontFamily: 'Helvetica-Bold',
-    color: INK,
-    textAlign: 'center',
-    letterSpacing: 1,
+  titleImg: {
+    width: TITLE_W,
+    height: TITLE_W / satyanarayanTitleAspect,
+    objectFit: 'contain',
   },
   address1: {
     fontSize: 11,
@@ -201,7 +203,7 @@ const S = StyleSheet.create({
   credit: {
     position: 'absolute',
     left: 838,
-    top: 410,
+    top: 438,          // run ends just inside the bottom border (border spans y 12..446)
     fontSize: 7.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
@@ -254,7 +256,7 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
 
             {/* Center Header Details */}
             <View style={S.headerCenter}>
-              <Text style={S.titleText}>SHREE SATYANARAYAN WEIGH-BRIDGE</Text>
+              <Image src={satyanarayanTitle} style={S.titleImg} />
               <Text style={S.address1}>SAMRAT INDUSTRIAL AREA 10/13 CORNER, GONDAL ROAD,</Text>
               <Text style={S.address2}>B/H. S.T. WORKSHOP, RAJKOT. Mo. 97731 30841</Text>
               <Text style={S.subTitle}>COMPUTERISED WEIGH BRIDGE</Text>

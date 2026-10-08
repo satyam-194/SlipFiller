@@ -1,5 +1,6 @@
 import React from 'react'
 import SlipScaler from './SlipScaler.jsx'
+import jaySatyanarayanTitle, { jaySatyanarayanTitleAspect } from './jaySatyanarayanTitle.js'
 
 // Color palette matched from jay satyanarayan.jpeg
 const INK = '#982435'          // Deep crimson/maroon press ink sampled from scan
@@ -10,6 +11,9 @@ const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
 const PAGE_W = 850
 const PAGE_H = 458
+
+// Rendered width of the title lettering image (height follows its aspect)
+const TITLE_W = 560
 
 const GUJ = "'Noto Sans Gujarati', sans-serif"
 const SANS = 'Helvetica, Arial, sans-serif'
@@ -139,20 +143,16 @@ export default function JaySatyanarayanPreview({ data }) {
             justifyContent: 'center',
           }}
         >
-          <div
+          <img
+            src={jaySatyanarayanTitle}
+            alt="SHREE JAY SATYANARAYAN WEIGH-BRIDGE"
             style={{
-              fontSize: 21,
-              fontWeight: 900,
-              fontFamily: "'Arial Black', 'Impact', 'Trebuchet MS', 'Helvetica Neue', Arial, sans-serif",
-              color: INK,
-              textAlign: 'center',
-              letterSpacing: 1,
-              whiteSpace: 'nowrap',
-              textTransform: 'uppercase',
+              width: TITLE_W,
+              height: TITLE_W / jaySatyanarayanTitleAspect,
+              display: 'block',
+              objectFit: 'contain',
             }}
-          >
-            SHREE JAY SATYANARAYAN WEIGH-BRIDGE
-          </div>
+          />
           <div
             style={{
               fontSize: 11,

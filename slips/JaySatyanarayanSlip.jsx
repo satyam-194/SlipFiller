@@ -1,7 +1,8 @@
 import React from 'react'
-import { Document, Text, View, StyleSheet } from '@react-pdf/renderer'
+import { Document, Text, View, Image, StyleSheet } from '@react-pdf/renderer'
 import '../fonts.js'
 import PrintPage from './printSpec.jsx'
+import jaySatyanarayanTitle, { jaySatyanarayanTitleAspect } from '../jaySatyanarayanTitle.js'
 
 // Color palette matched from jay satyanarayan.jpeg scan
 const INK = '#982435'          // Deep crimson red press ink
@@ -12,6 +13,9 @@ const VAL = '#1a1a1a'          // Dark charcoal for values
 
 const PAGE_W = 850
 const PAGE_H = 458
+
+// Rendered width of the title lettering image (height follows its aspect)
+const TITLE_W = 560
 
 const S = StyleSheet.create({
   // Main red border without radius + pink background inside
@@ -76,12 +80,10 @@ const S = StyleSheet.create({
     width: 630,
     alignItems: 'center',
   },
-  titleText: {
-    fontSize: 21,
-    fontFamily: 'Helvetica-Bold',
-    color: INK,
-    textAlign: 'center',
-    letterSpacing: 1,
+  titleImg: {
+    width: TITLE_W,
+    height: TITLE_W / jaySatyanarayanTitleAspect,
+    objectFit: 'contain',
   },
   address1: {
     fontSize: 11,
@@ -254,7 +256,7 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
 
             {/* Center Header Details */}
             <View style={S.headerCenter}>
-              <Text style={S.titleText}>SHREE JAY SATYANARAYAN WEIGH-BRIDGE</Text>
+              <Image src={jaySatyanarayanTitle} style={S.titleImg} />
               <Text style={S.address1}>Averest industrial Area, B/h. Tata Perfect Show Room, Nr. Poonam Dumper,</Text>
               <Text style={S.address2}>8/B National Highway, Gondal Road, Vavdi, Rajkot. Mo : 096873 93057</Text>
               <Text style={S.subTitle}>COMPUTERISED WEIGH BRIDGE</Text>

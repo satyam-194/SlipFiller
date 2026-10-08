@@ -58,7 +58,9 @@ const COL = {
 }
 // CHARGES (Rs.) prints from the weighing software. It sits on the NET line,
 // right of the "Kg. :" label and clear of the DATE/TIME runs above it.
-const CHARGES = { label: 430, value: 580, top: 158 }
+// The label is 15 condensed chars ~= 171pt wide, so the amount has to start
+// clear of 430+171; 610 leaves a single space between them.
+const CHARGES = { label: 430, value: 610, top: 158 }
 
 // Notes band below the fields box
 const NOTES_LEFT = FRAME.left + 16
@@ -99,6 +101,12 @@ const S = StyleSheet.create({
   val: { position: 'absolute', fontSize: 15, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
   // the weighing software prints the weight figures enlarged
   wVal: { position: 'absolute', fontSize: 20, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1.5 },
+  // Condensed pitch. The LX-310 switches to 17 CPI (ESC SI) for a run that
+  // would otherwise overflow its field, rather than printing past the edge —
+  // a full 13-char registration at 10 CPI is 207pt wide but the VEHICLE NO.
+  // field only has 148pt before the frame, and "CHARGES (Rs.) :" at 10 CPI
+  // would run under its own amount. Same face, narrower cell.
+  valNarrow: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
   icon: { position: 'absolute' },
 
   // ---- notes ----
@@ -273,7 +281,7 @@ export default function ViratSlip({ data, mode = 'full', offsetX = 0, offsetY = 
             <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: BOX.width, height: BOX.height }}>
               <Text style={[S.val, { left: L.value, top: ROWS.serial - 1, color: vColor }]}>{data.serialNo || ' '}</Text>
               <Text style={[S.val, { left: L.value, top: ROWS.party - 1, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.val, { left: R.value, top: R.vehicle - 1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+              <Text style={[S.valNarrow, { left: R.value, top: R.vehicle + 1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
               <Text style={[S.val, { left: R.value, top: R.material - 1, color: vColor }]}>{data.material || ' '}</Text>
 
               {/* Weight figures print above their row's label line */}
@@ -291,8 +299,8 @@ export default function ViratSlip({ data, mode = 'full', offsetX = 0, offsetY = 
                   amount — it is not part of the pre-printed stationery */}
               {data.charges ? (
                 <>
-                  <Text style={[S.val, { left: CHARGES.label, top: CHARGES.top, color: vColor }]}>CHARGES (Rs.) :</Text>
-                  <Text style={[S.val, { left: CHARGES.value, top: CHARGES.top, color: vColor }]}>{data.charges}/-</Text>
+                  <Text style={[S.valNarrow, { left: CHARGES.label, top: CHARGES.top + 2, color: vColor }]}>CHARGES (Rs.) :</Text>
+                  <Text style={[S.valNarrow, { left: CHARGES.value, top: CHARGES.top + 2, color: vColor }]}>{data.charges}/-</Text>
                 </>
               ) : null}
             </View>

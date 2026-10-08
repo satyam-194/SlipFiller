@@ -56,6 +56,8 @@ const centred = { display: 'flex', alignItems: 'center', justifyContent: 'center
 const lblR = { position: 'absolute', fontSize: 15, fontWeight: 700, fontFamily: SANS, color: INK, textAlign: 'right', whiteSpace: 'nowrap', lineHeight: 1.15 }
 const lbl = { position: 'absolute', fontSize: 15, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap', lineHeight: 1.15 }
 const val = { position: 'absolute', fontSize: 15, fontFamily: DOT, color: VAL, letterSpacing: 1, whiteSpace: 'nowrap', lineHeight: 1.15 }
+// Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
+const valNarrow = { ...val, fontSize: 11, letterSpacing: 0.4 }
 // the weighing software prints the weight figures enlarged
 const wVal = { ...val, fontSize: 20, letterSpacing: 1.5 }
 const noteRow = { position: 'absolute', display: 'flex', alignItems: 'center' }
@@ -190,7 +192,7 @@ export default function ViratPreview({ data }) {
 
           <span style={{ ...val, left: L.value, top: ROWS.serial - 1 }}>{data.serialNo}</span>
           <span style={{ ...val, left: L.value, top: ROWS.party - 1 }}>{data.party}</span>
-          <span style={{ ...val, left: R.value, top: R.vehicle - 1 }}>{data.vehicleNo}</span>
+          <span style={{ ...valNarrow, left: R.value, top: R.vehicle + 1 }}>{data.vehicleNo}</span>
           <span style={{ ...val, left: R.value, top: R.material - 1 }}>{data.material}</span>
 
           <WeighRowLabels y={ROW.gross} icon={<TruckLoadedIcon />} label="GROSS :" kgLabel="Kg. DATE :" />
@@ -214,8 +216,8 @@ export default function ViratPreview({ data }) {
           {/* CHARGES label + amount both print from the weighing software */}
           {data.charges ? (
             <>
-              <span style={{ ...val, left: CHARGES.label, top: CHARGES.top }}>CHARGES (Rs.) :</span>
-              <span style={{ ...val, left: CHARGES.value, top: CHARGES.top }}>{data.charges}/-</span>
+              <span style={{ ...valNarrow, left: CHARGES.label, top: CHARGES.top + 2 }}>CHARGES (Rs.) :</span>
+              <span style={{ ...valNarrow, left: CHARGES.value, top: CHARGES.top + 2 }}>{data.charges}/-</span>
             </>
           ) : null}
         </div>

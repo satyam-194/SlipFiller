@@ -55,7 +55,8 @@ const COL = {
   time: 572, timeVal: 656,
 }
 // Charges prints below the NETT row, right of centre
-const CHARGES = { label: 548, value: 690, top: 142 }
+// label is 13 condensed chars (~140pt) from 548, so the amount starts at 700
+const CHARGES = { label: 548, value: 700, top: 142 }
 
 // 24 HOURS SERVICE block sits at bottom-left, inside the notes band
 const HRS = { left: FRAME.left + 5, top: 320, width: 112, height: 80 }
@@ -99,6 +100,10 @@ const S = StyleSheet.create({
   box: { position: 'absolute', ...BOX },
   lbl: { position: 'absolute', fontSize: 14, fontFamily: 'Helvetica-Bold', color: INK },
   val: { position: 'absolute', fontSize: 15, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Condensed pitch (the printer's 17 CPI mode) for runs that will not fit
+  // their field at 10 CPI: the 13-char registration, the DATE runs (which
+  // would reach the pre-printed TIME label) and the Charges caption.
+  valNarrow: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
   // the weighing software prints the weight figures enlarged
   wVal: { position: 'absolute', fontSize: 19, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1.5 },
   icon: { position: 'absolute' },
@@ -202,8 +207,8 @@ function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
   return (
     <>
       <Text style={[S.wVal, { left: COL.value, top: y - 10, color }]}>{value || ' '}</Text>
-      {date && <Text style={[S.val, { left: COL.dateVal, top: y - 8, color }]}>{dateVal || ' '}</Text>}
-      {time && <Text style={[S.val, { left: COL.timeVal, top: y - 8, color }]}>{timeVal || ' '}</Text>}
+      {date && <Text style={[S.valNarrow, { left: COL.dateVal, top: y - 6, color }]}>{dateVal || ' '}</Text>}
+      {time && <Text style={[S.valNarrow, { left: COL.timeVal, top: y - 6, color }]}>{timeVal || ' '}</Text>}
     </>
   )
 }
@@ -279,7 +284,7 @@ export default function HarikrushnaSlip({ data, mode = 'full', offsetX = 0, offs
             <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: BOX.width, height: BOX.height }}>
               <Text style={[S.val, { left: L.value, top: ROWS.serial - 1, color: vColor }]}>{data.serialNo || ' '}</Text>
               <Text style={[S.val, { left: L.value, top: ROWS.party - 1, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.val, { left: R.value, top: R.vehicle - 1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+              <Text style={[S.valNarrow, { left: R.value, top: R.vehicle + 1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
               <Text style={[S.val, { left: R.value, top: R.material - 1, color: vColor }]}>{data.material || ' '}</Text>
 
               <WeighRowValues y={ROW.gross} value={data.gross} date dateVal={fmtDate(data.grossDate)} time timeVal={fmtTime(data.grossTime)} color={vColor} />
@@ -290,8 +295,8 @@ export default function HarikrushnaSlip({ data, mode = 'full', offsetX = 0, offs
                   — it is not part of the pre-printed stationery */}
               {data.charges ? (
                 <>
-                  <Text style={[S.val, { left: CHARGES.label, top: CHARGES.top, color: vColor }]}>Charges(Rs) :</Text>
-                  <Text style={[S.val, { left: CHARGES.value, top: CHARGES.top, color: vColor }]}>{data.charges}</Text>
+                  <Text style={[S.valNarrow, { left: CHARGES.label, top: CHARGES.top + 2, color: vColor }]}>Charges(Rs) :</Text>
+                  <Text style={[S.valNarrow, { left: CHARGES.value, top: CHARGES.top + 2, color: vColor }]}>{data.charges}</Text>
                 </>
               ) : null}
             </View>

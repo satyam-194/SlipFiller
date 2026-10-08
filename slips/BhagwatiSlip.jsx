@@ -47,7 +47,11 @@ const BOX = { left: 30, top: 140, width: 790, height: 182 }
 
 const L = { label: 14, labelW: 150, value: 180 }
 const ROWS = { serial: 10, party: 32 }
-const R = { label: 470, labelW: 180, value: 666, vehicle: 32, material: 56 }
+// The VEHICLE NO. value is the tightest run on this slip: a 13-char
+// registration has to clear the pre-printed label, which right-aligns to 650,
+// and still finish inside the 790-wide box. At vehicleVal's 9.5pt/0.2
+// condensed pitch it is 126pt wide, so 652 clears the label and ends at 778.
+const R = { label: 470, labelW: 180, value: 666, vehicleValue: 652, vehicle: 32, material: 56 }
 
 // Weigh rows (box-relative Y centres)
 const ROW = { gross: 90, tare: 126, net: 158 }
@@ -108,6 +112,13 @@ const S = StyleSheet.create({
   lblR: { position: 'absolute', fontSize: 14.5, fontFamily: 'Helvetica-Bold', color: INK, textAlign: 'right' },
   lbl: { position: 'absolute', fontSize: 14.5, fontFamily: 'Helvetica-Bold', color: INK },
   val: { position: 'absolute', fontSize: 15, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Condensed pitch (the printer's 17 CPI mode) for the runs that will not fit
+  // their field at 10 CPI: a 13-char registration from x=666 would need 207pt
+  // but the box ends 124pt later, and a 10-char date from x=430 would run into
+  // the pre-printed TIME label at 578.
+  valNarrow: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
+  // The VEHICLE NO. field is tighter still — see R.vehicleValue.
+  vehicleVal: { position: 'absolute', fontSize: 9.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.2 },
   // the weighing software prints the weight figures enlarged
   wVal: { position: 'absolute', fontSize: 20, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1.5 },
   icon: { position: 'absolute' },
@@ -297,16 +308,16 @@ export default function BhagwatiSlip({ data, mode = 'full', offsetX = 0, offsetY
             <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: BOX.width, height: BOX.height }}>
               <Text style={[S.val, { left: L.value, top: ROWS.serial - 1, color: vColor }]}>{data.serialNo || ' '}</Text>
               <Text style={[S.val, { left: L.value, top: ROWS.party - 1, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.val, { left: R.value, top: R.vehicle - 1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+              <Text style={[S.vehicleVal, { left: R.vehicleValue, top: R.vehicle + 2, color: vColor }]}>{data.vehicleNo || ' '}</Text>
               <Text style={[S.val, { left: R.value, top: R.material - 1, color: vColor }]}>{data.material || ' '}</Text>
 
               <Text style={[S.wVal, { left: COL.value, top: ROW.gross - 11, color: vColor }]}>{data.gross || ' '}</Text>
-              <Text style={[S.val, { left: COL.dateVal, top: ROW.gross - 8, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
-              <Text style={[S.val, { left: COL.timeVal, top: ROW.gross - 8, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
+              <Text style={[S.valNarrow, { left: COL.dateVal, top: ROW.gross - 6, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
+              <Text style={[S.valNarrow, { left: COL.timeVal, top: ROW.gross - 6, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
               <Text style={[S.wVal, { left: COL.value, top: ROW.tare - 11, color: vColor }]}>{data.tare || ' '}</Text>
-              <Text style={[S.val, { left: COL.dateVal, top: ROW.tare - 8, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-              <Text style={[S.val, { left: COL.timeVal, top: ROW.tare - 8, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+              <Text style={[S.valNarrow, { left: COL.dateVal, top: ROW.tare - 6, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
+              <Text style={[S.valNarrow, { left: COL.timeVal, top: ROW.tare - 6, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
               <Text style={[S.wVal, { left: COL.value, top: ROW.net - 11, color: vColor }]}>{data.net || ' '}</Text>
 
@@ -314,8 +325,8 @@ export default function BhagwatiSlip({ data, mode = 'full', offsetX = 0, offsetY
                   next to the pre-printed CHARGE label */}
               {data.charges ? (
                 <>
-                  <Text style={[S.val, { left: CHARGES.label, top: ROW.net - 8, color: vColor }]}>Charges(Rs):</Text>
-                  <Text style={[S.val, { left: CHARGES.value, top: ROW.net - 8, color: vColor }]}>{data.charges}</Text>
+                  <Text style={[S.valNarrow, { left: CHARGES.label, top: ROW.net - 6, color: vColor }]}>Charges(Rs):</Text>
+                  <Text style={[S.valNarrow, { left: CHARGES.value, top: ROW.net - 6, color: vColor }]}>{data.charges}</Text>
                 </>
               ) : null}
             </View>

@@ -45,9 +45,13 @@ const S = StyleSheet.create({
 
   // ---- fields box ----
   lbl: { position: 'absolute', fontSize: 13, fontFamily: 'Helvetica-Bold', color: INK },
-  val: { position: 'absolute', fontSize: 13, fontFamily: 'Helvetica', color: VAL },
+  // Typed values use the LX-310 draft face, like every other slip — these two
+  // were still on Helvetica. The dot face is monospaced at 10 CPI and so runs
+  // wider per character than Helvetica at the same size; 11.5/12 keeps the
+  // longest values inside their printed field.
+  val: { position: 'absolute', fontSize: 11.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.5 },
   wLbl: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica-Bold', color: INK },
-  wVal: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica', color: VAL },
+  wVal: { position: 'absolute', fontSize: 12, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.5 },
   icon: { position: 'absolute' },
 
   // ---- notes ----

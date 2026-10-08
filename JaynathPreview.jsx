@@ -30,6 +30,8 @@ const fmtTime = (t) => {
   const ap = h >= 12 ? 'PM' : 'AM'
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
+// Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
+const valNarrow = { ...val, fontSize: 11, letterSpacing: 0.4 }
 
 const DECO = "'Deco', 'Arial Black', sans-serif"
 const sideSmall = { fontSize: 8.6, fontWeight: 700, fontFamily: SANS, color: '#fff', textAlign: 'center', lineHeight: 1.25 }
@@ -111,12 +113,12 @@ export default function JaynathPreview({ data }) {
         <span style={{ ...val, left: 585, top: 194 }}>{data.material}</span>
         <span style={{ ...lbl, left: 440, top: 240 }}>Gross Date</span>
         <span style={{ ...lbl, left: 548, top: 240 }}>:</span>
-        <span style={{ ...val, left: 575, top: 238 }}>{fmtDateSlash(data.grossDate)}</span>
-        <span style={{ ...val, left: 700, top: 240, fontSize: 12 }}>{fmtTime(data.grossTime)}</span>
+        <span style={{ ...valNarrow, left: 575, top: 240 }}>{fmtDateSlash(data.grossDate)}</span>
+        <span style={{ ...valNarrow, left: 700, top: 240 }}>{fmtTime(data.grossTime)}</span>
         <span style={{ ...lbl, left: 440, top: 282 }}>Tare Date</span>
         <span style={{ ...lbl, left: 548, top: 282 }}>:</span>
-        <span style={{ ...val, left: 575, top: 280 }}>{fmtDateSlash(data.tareDate)}</span>
-        <span style={{ ...val, left: 700, top: 282, fontSize: 12 }}>{fmtTime(data.tareTime)}</span>
+        <span style={{ ...valNarrow, left: 575, top: 282 }}>{fmtDateSlash(data.tareDate)}</span>
+        <span style={{ ...valNarrow, left: 700, top: 282 }}>{fmtTime(data.tareTime)}</span>
         <span style={{ ...lbl, left: 440, top: 324 }}>Charges</span>
         <span style={{ ...lbl, left: 548, top: 324 }}>:</span>
         <span style={{ ...val, left: 700, top: 315 }}>{fmtCharges(data.charges)}</span>

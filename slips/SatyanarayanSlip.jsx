@@ -133,6 +133,15 @@ const S = StyleSheet.create({
     fontFamily: 'DotMatrix',
     letterSpacing: 1,
   },
+  // Condensed pitch (the printer's 17 CPI mode) for the VEHICLE NO. run: a
+  // 13-char registration from x=680 is 188pt at the normal size and would end
+  // at 868, well past the 850 canvas. At 9.5/0.2 it is 126pt and ends at 806.
+  valNarrow: {
+    position: 'absolute',
+    fontSize: 9.5,
+    fontFamily: 'DotMatrix',
+    letterSpacing: 0.2,
+  },
 
   // Gujarati terms
   noteRow: {
@@ -325,7 +334,7 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
           <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
             {/* Row 1 Values */}
             <Text style={[S.val, { left: 150, top: 140, color: vColor }]}>{data.serialNo || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 140, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 680, top: 143, color: vColor }]}>{data.vehicleNo || ' '}</Text>
 
             {/* Row 2 Values */}
             <Text style={[S.val, { left: 150, top: 176, color: vColor }]}>{supplierValue || ' '}</Text>

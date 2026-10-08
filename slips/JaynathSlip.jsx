@@ -40,6 +40,10 @@ const S = StyleSheet.create({
 
   lbl: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica-Bold', color: INK },
   val: { position: 'absolute', fontSize: 14, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Condensed pitch (the printer's 17 CPI mode) for the Gross/Tare Date runs:
+  // a 10-char date from x=575 is 149pt at the normal size and would end at
+  // 724, running under the time that starts at 700. At 11/0.4 it ends at 689.
+  valNarrow: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
 
   guj: { position: 'absolute', fontSize: 10.5, fontFamily: 'NotoGujarati', fontWeight: 400, color: INK },
   lat: { position: 'absolute', fontSize: 11.5, fontFamily: 'Helvetica', color: INK },
@@ -157,10 +161,10 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
             <Text style={[S.val, { left: 215, top: 335, fontSize: 17, color: vColor }]}>{data.net || ' '}</Text>
             <Text style={[S.val, { left: 585, top: 150, color: vColor }]}>{data.supplierName || ' '}</Text>
             <Text style={[S.val, { left: 585, top: 194, color: vColor }]}>{data.material || ' '}</Text>
-            <Text style={[S.val, { left: 575, top: 238, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Text>
-            <Text style={[S.val, { left: 700, top: 238, fontSize: 12, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
-            <Text style={[S.val, { left: 575, top: 280, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Text>
-            <Text style={[S.val, { left: 700, top: 280, fontSize: 12, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 575, top: 240, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 700, top: 240, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 575, top: 282, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 700, top: 282, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
             <Text style={[S.val, { left: 700, top: 315, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Text>
           </View>
         )}

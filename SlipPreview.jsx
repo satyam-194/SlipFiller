@@ -12,11 +12,14 @@ const PAGE_H = 458
 const GUJ = "'Noto Sans Gujarati', sans-serif"
 const SANS = 'Helvetica, Arial, sans-serif'
 const SERIF = '"Times New Roman", Times, serif'
+const DOT = "'DotMatrix', 'Courier New', monospace"
 
 const lbl = { position: 'absolute', fontSize: 13, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap', lineHeight: 1.15 }
-const val = { position: 'absolute', fontSize: 13, fontFamily: SANS, color: VAL, whiteSpace: 'nowrap', lineHeight: 1.15 }
+// Values print from the weighing software through an LX-310 — see the matching
+// fontSize/letterSpacing in slips/AmbikaSlip.jsx, which this must mirror.
+const val = { position: 'absolute', fontSize: 11.5, fontFamily: DOT, color: VAL, letterSpacing: 0.5, whiteSpace: 'nowrap', lineHeight: 1.15 }
 const wLbl = { ...lbl, fontSize: 13.5 }
-const wVal = { ...val, fontSize: 13.5 }
+const wVal = { ...val, fontSize: 12 }
 const bullet = { width: 6.5, height: 6.5, backgroundColor: INK, marginRight: 7, flexShrink: 0 }
 const noteRow = { position: 'absolute', display: 'flex', alignItems: 'center' }
 const guj = { fontSize: 10.8, fontFamily: GUJ, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }

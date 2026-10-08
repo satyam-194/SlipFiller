@@ -35,6 +35,8 @@ const val = {
   lineHeight: 1.15,
   letterSpacing: 1,
 }
+// Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
+const valNarrow = { ...val, fontSize: 11, letterSpacing: 0.4 }
 
 // Truck Loaded Icon (GROSS)
 function MurlidharTruckLoaded() {
@@ -366,7 +368,7 @@ export default function MurlidharPreview({ data }) {
         <div style={{ ...val, left: 418, top: 134 }}>{data.charges || ''}</div>
 
         <div style={{ ...lbl, left: 540, top: 134 }}>VEHICLE No. :</div>
-        <div style={{ ...val, left: 650, top: 134 }}>{data.vehicleNo || ''}</div>
+        <div style={{ ...valNarrow, left: 650, top: 136 }}>{data.vehicleNo || ''}</div>
 
         {/* Row 2: RECEIVER, SUPPLIER */}
         <div style={{ ...lbl, left: 32, top: 162 }}>RECEIVER :</div>

@@ -89,6 +89,10 @@ const S = StyleSheet.create({
   // ---- fields ----
   lbl: { position: 'absolute', fontSize: 14, fontFamily: 'Helvetica-Bold', color: INK },
   val: { position: 'absolute', fontSize: 15, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Condensed pitch (the printer's 17 CPI mode) for runs that will not fit
+  // their field at 10 CPI: the 13-char registration, the DATE runs (which
+  // would reach the pre-printed TIME label) and the Charges caption.
+  valNarrow: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
   // the weighing software prints the weight figures enlarged
   wVal: { position: 'absolute', fontSize: 19, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1.5 },
   icon: { position: 'absolute' },
@@ -200,8 +204,8 @@ function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
   return (
     <>
       <Text style={[S.wVal, { left: COL.value, top: y - 10, color }]}>{value || ' '}</Text>
-      {date && <Text style={[S.val, { left: COL.dateVal, top: y - 8, color }]}>{dateVal || ' '}</Text>}
-      {time && <Text style={[S.val, { left: COL.timeVal, top: y - 8, color }]}>{timeVal || ' '}</Text>}
+      {date && <Text style={[S.valNarrow, { left: COL.dateVal, top: y - 6, color }]}>{dateVal || ' '}</Text>}
+      {time && <Text style={[S.valNarrow, { left: COL.timeVal, top: y - 6, color }]}>{timeVal || ' '}</Text>}
     </>
   )
 }
@@ -283,7 +287,7 @@ export default function MarutiSlip({ data, mode = 'full', offsetX = 0, offsetY =
             <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: BOX.width, height: BOX.height }}>
               <Text style={[S.val, { left: 136, top: 6, color: vColor }]}>{data.serialNo || ' '}</Text>
               <Text style={[S.val, { left: 136, top: 25, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.val, { left: COL.rVal, top: 14, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+              <Text style={[S.valNarrow, { left: COL.rVal, top: 16, color: vColor }]}>{data.vehicleNo || ' '}</Text>
               <Text style={[S.val, { left: COL.rVal, top: 35, color: vColor }]}>{data.material || ' '}</Text>
 
               <WeighRowValues y={ROW.gross} value={data.gross} date dateVal={fmtDate(data.grossDate)} time timeVal={fmtTime(data.grossTime)} color={vColor} />
@@ -294,8 +298,8 @@ export default function MarutiSlip({ data, mode = 'full', offsetX = 0, offsetY =
                   the amount — it is not part of the pre-printed stationery */}
               {data.charges ? (
                 <>
-                  <Text style={[S.val, { left: COL.chargesLbl, top: ROW.net - 8, color: vColor }]}>Charges(Rs):</Text>
-                  <Text style={[S.val, { left: COL.chargesVal, top: ROW.net - 8, color: vColor }]}>{data.charges}</Text>
+                  <Text style={[S.valNarrow, { left: COL.chargesLbl, top: ROW.net - 6, color: vColor }]}>Charges(Rs):</Text>
+                  <Text style={[S.valNarrow, { left: COL.chargesVal, top: ROW.net - 6, color: vColor }]}>{data.charges}</Text>
                 </>
               ) : null}
             </View>

@@ -38,6 +38,8 @@ const val = {
   lineHeight: 1.15,
   letterSpacing: 1,
 }
+// Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
+const valNarrow = { ...val, fontSize: 9.5, letterSpacing: 0.2 }
 
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
@@ -215,7 +217,7 @@ export default function JaySatyanarayanPreview({ data }) {
         <div style={{ ...lbl, left: 36, top: 140 }}>RST NO.  :</div>
         <div style={{ ...val, left: 150, top: 140 }}>{data.serialNo || ''}</div>
         <div style={{ ...lbl, left: 540, top: 140 }}>VEHICLE NO. :</div>
-        <div style={{ ...val, left: 680, top: 140 }}>{data.vehicleNo || ''}</div>
+        <div style={{ ...valNarrow, left: 680, top: 143 }}>{data.vehicleNo || ''}</div>
 
         {/* Row 2: SUPPLIER & MATERIAL */}
         <div style={{ ...lbl, left: 36, top: 176 }}>SUPPLIER :</div>

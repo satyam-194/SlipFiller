@@ -57,9 +57,17 @@ const S = StyleSheet.create({
 
   // ---- fields ----
   lbl: { position: 'absolute', fontSize: 14, fontFamily: 'Helvetica-Bold', color: INK },
-  val: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica', color: VAL },
+  // Typed values use the LX-310 draft face, like every other slip — these two
+  // were still on Helvetica. The dot face is monospaced at 10 CPI and so runs
+  // wider per character than Helvetica at the same size; 12 keeps the longest
+  // values (party name, vehicle no.) inside their printed field.
+  val: { position: 'absolute', fontSize: 12, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.5 },
   wLbl: { position: 'absolute', fontSize: 14, fontFamily: 'Helvetica-Bold', color: INK },
-  wVal: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica', color: VAL },
+  wVal: { position: 'absolute', fontSize: 12, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.5 },
+  // Condensed pitch (the printer's 17 CPI mode) for the TIME column: it starts
+  // at x=748 inside an 830-wide box, so an 8-char "02:35 PM" at the normal
+  // size would run 17pt past the frame.
+  tVal: { position: 'absolute', fontSize: 10, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.2 },
   icon: { position: 'absolute' },
 
   // ---- notes ----
@@ -179,7 +187,7 @@ function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
     <>
       <Text style={[S.wVal, { left: COL.value, top: y - 7, color }]}>{value || ' '}</Text>
       {date && <Text style={[S.wVal, { left: COL.dateVal, top: y - 7, color }]}>{dateVal || ' '}</Text>}
-      {time && <Text style={[S.wVal, { left: COL.timeVal, top: y - 7, color }]}>{timeVal || ' '}</Text>}
+      {time && <Text style={[S.tVal, { left: COL.timeVal, top: y - 6, color }]}>{timeVal || ' '}</Text>}
     </>
   )
 }

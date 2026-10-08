@@ -12,6 +12,7 @@ const PAGE_H = 458
 const GUJ = "'Noto Sans Gujarati', sans-serif"
 const SANS = 'Helvetica, Arial, sans-serif'
 const SERIF = '"Times New Roman", Times, serif'
+const DOT = "'DotMatrix', 'Courier New', monospace"
 
 const HEAD = { left: 10, top: 8, right: 840, height: 112 }
 const LOGO_W = 118
@@ -19,7 +20,9 @@ const RIGHT_W = 136
 const BOX = { left: 10, top: 126, width: 830, height: 218 }
 
 const lbl = { position: 'absolute', fontSize: 14, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap', lineHeight: 1.15 }
-const val = { position: 'absolute', fontSize: 13.5, fontFamily: SANS, color: VAL, whiteSpace: 'nowrap', lineHeight: 1.15 }
+// Values print from the weighing software through an LX-310 — see the matching
+// fontSize/letterSpacing in slips/DhartiSlip.jsx, which this must mirror.
+const val = { position: 'absolute', fontSize: 12, fontFamily: DOT, color: VAL, letterSpacing: 0.5, whiteSpace: 'nowrap', lineHeight: 1.15 }
 const wLbl = { ...lbl }
 const wVal = { ...val }
 const noteRow = { position: 'absolute', display: 'flex', alignItems: 'center' }

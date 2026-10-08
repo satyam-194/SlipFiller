@@ -55,6 +55,9 @@ const centred = { display: 'flex', alignItems: 'center', justifyContent: 'center
 const lblR = { position: 'absolute', fontSize: 14.5, fontWeight: 700, fontFamily: SANS, color: INK, textAlign: 'right', whiteSpace: 'nowrap', lineHeight: 1.15 }
 const lbl = { position: 'absolute', fontSize: 14.5, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap', lineHeight: 1.15 }
 const val = { position: 'absolute', fontSize: 15, fontFamily: DOT, color: VAL, letterSpacing: 1, whiteSpace: 'nowrap', lineHeight: 1.15 }
+// Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
+const valNarrow = { ...val, fontSize: 11, letterSpacing: 0.4 }
+const vehicleVal = { ...val, fontSize: 9.5, letterSpacing: 0.2 }
 // the weighing software prints the weight figures enlarged
 const wVal = { ...val, fontSize: 20, letterSpacing: 1.5 }
 const noteRow = { position: 'absolute', display: 'flex', alignItems: 'center' }
@@ -218,7 +221,7 @@ export default function BhagwatiPreview({ data }) {
 
           <span style={{ ...val, left: L.value, top: ROWS.serial - 1 }}>{data.serialNo}</span>
           <span style={{ ...val, left: L.value, top: ROWS.party - 1 }}>{data.party}</span>
-          <span style={{ ...val, left: R.value, top: R.vehicle - 1 }}>{data.vehicleNo}</span>
+          <span style={{ ...vehicleVal, left: 652, top: R.vehicle + 2 }}>{data.vehicleNo}</span>
           <span style={{ ...val, left: R.value, top: R.material - 1 }}>{data.material}</span>
 
           <WeighRowLabels y={ROW.gross} icon={<TruckLoadedIcon />} label="GROSS :" kg date time />
@@ -226,20 +229,20 @@ export default function BhagwatiPreview({ data }) {
           <WeighRowLabels y={ROW.net} icon={<NettSquaresIcon />} label="NETT :" kg charge />
 
           <span style={{ ...wVal, left: COL.value, top: ROW.gross - 11 }}>{data.gross}</span>
-          <span style={{ ...val, left: COL.dateVal, top: ROW.gross - 8 }}>{fmtDate(data.grossDate)}</span>
-          <span style={{ ...val, left: COL.timeVal, top: ROW.gross - 8 }}>{fmtTime(data.grossTime)}</span>
+          <span style={{ ...valNarrow, left: COL.dateVal, top: ROW.gross - 6 }}>{fmtDate(data.grossDate)}</span>
+          <span style={{ ...valNarrow, left: COL.timeVal, top: ROW.gross - 6 }}>{fmtTime(data.grossTime)}</span>
 
           <span style={{ ...wVal, left: COL.value, top: ROW.tare - 11 }}>{data.tare}</span>
-          <span style={{ ...val, left: COL.dateVal, top: ROW.tare - 8 }}>{fmtDate(data.tareDate)}</span>
-          <span style={{ ...val, left: COL.timeVal, top: ROW.tare - 8 }}>{fmtTime(data.tareTime)}</span>
+          <span style={{ ...valNarrow, left: COL.dateVal, top: ROW.tare - 6 }}>{fmtDate(data.tareDate)}</span>
+          <span style={{ ...valNarrow, left: COL.timeVal, top: ROW.tare - 6 }}>{fmtTime(data.tareTime)}</span>
 
           <span style={{ ...wVal, left: COL.value, top: ROW.net - 11 }}>{data.net}</span>
 
           {/* The weighing software prints its own "Charges(Rs):" caption */}
           {data.charges ? (
             <>
-              <span style={{ ...val, left: CHARGES.label, top: ROW.net - 8 }}>Charges(Rs):</span>
-              <span style={{ ...val, left: CHARGES.value, top: ROW.net - 8 }}>{data.charges}</span>
+              <span style={{ ...valNarrow, left: CHARGES.label, top: ROW.net - 6 }}>Charges(Rs):</span>
+              <span style={{ ...valNarrow, left: CHARGES.value, top: ROW.net - 6 }}>{data.charges}</span>
             </>
           ) : null}
         </div>

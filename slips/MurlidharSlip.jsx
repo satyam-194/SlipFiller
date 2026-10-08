@@ -273,6 +273,15 @@ const S = StyleSheet.create({
     fontFamily: 'DotMatrix',
     letterSpacing: 1,
   },
+  // Condensed pitch (the printer's 17 CPI mode) for the VEHICLE No. run: a
+  // 13-char registration from x=650 is 188pt at the normal size and would end
+  // at 838, past the 850 canvas once the frame is allowed for.
+  valNarrow: {
+    position: 'absolute',
+    fontSize: 11,
+    fontFamily: 'DotMatrix',
+    letterSpacing: 0.4,
+  },
 
   // Weigh Rows
   iconWrap: {
@@ -584,7 +593,7 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
             {/* Row 1: SR. NO, CHARGES, VEHICLE No. */}
             <Text style={[S.val, { left: 98, top: 134, color: vColor }]}>{data.serialNo || ' '}</Text>
             <Text style={[S.val, { left: 418, top: 134, color: vColor }]}>{data.charges || ' '}</Text>
-            <Text style={[S.val, { left: 650, top: 134, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 650, top: 136, color: vColor }]}>{data.vehicleNo || ' '}</Text>
 
             {/* Row 2: RECEIVER, SUPPLIER */}
             <Text style={[S.val, { left: 118, top: 162, color: vColor }]}>{receiverValue || ' '}</Text>

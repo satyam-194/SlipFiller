@@ -51,6 +51,8 @@ const NOTES_STEP = 14.5
 
 const lbl = { position: 'absolute', fontSize: 14, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap', lineHeight: 1.15 }
 const val = { position: 'absolute', fontSize: 15, fontFamily: DOT, color: VAL, letterSpacing: 1, whiteSpace: 'nowrap', lineHeight: 1.15 }
+// Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
+const valNarrow = { ...val, fontSize: 11, letterSpacing: 0.4 }
 // the weighing software prints the weight figures enlarged
 const wVal = { ...val, fontSize: 19, letterSpacing: 1.5 }
 const noteRow = { position: 'absolute', display: 'flex', alignItems: 'center' }
@@ -198,7 +200,7 @@ export default function MarutiPreview({ data }) {
 
           <span style={{ ...val, left: 136, top: 6 }}>{data.serialNo}</span>
           <span style={{ ...val, left: 136, top: 25 }}>{data.party}</span>
-          <span style={{ ...val, left: COL.rVal, top: 14 }}>{data.vehicleNo}</span>
+          <span style={{ ...valNarrow, left: COL.rVal, top: 16 }}>{data.vehicleNo}</span>
           <span style={{ ...val, left: COL.rVal, top: 35 }}>{data.material}</span>
 
           <WeighRow y={ROW.gross} icon={<TruckLoadedIcon />} label="GROSS :" value={data.gross}
@@ -210,8 +212,8 @@ export default function MarutiPreview({ data }) {
           {/* Dot-matrix printed Charges label + amount, as on the real system */}
           {data.charges ? (
             <>
-              <span style={{ ...val, left: COL.chargesLbl, top: ROW.net - 8 }}>Charges(Rs):</span>
-              <span style={{ ...val, left: COL.chargesVal, top: ROW.net - 8 }}>{data.charges}</span>
+              <span style={{ ...valNarrow, left: COL.chargesLbl, top: ROW.net - 6 }}>Charges(Rs):</span>
+              <span style={{ ...valNarrow, left: COL.chargesVal, top: ROW.net - 6 }}>{data.charges}</span>
             </>
           ) : null}
         </div>

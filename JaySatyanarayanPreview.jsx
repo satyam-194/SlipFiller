@@ -99,8 +99,8 @@ export default function JaySatyanarayanPreview({ data }) {
           }}
         >
           <span style={{ fontSize: 38, fontWeight: 900, color: INK, lineHeight: 1 }}>100</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 3, letterSpacing: 0.6 }}>MATRIC</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 3, letterSpacing: 0.6 }}>MATRIC</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
         {/* Right Box: 5 MATRIC TON (same background as main background) */}
@@ -122,8 +122,8 @@ export default function JaySatyanarayanPreview({ data }) {
           }}
         >
           <span style={{ fontSize: 42, fontWeight: 900, color: INK, lineHeight: 1 }}>5</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 2, letterSpacing: 0.6 }}>MATRIC</span>
-          <span style={{ fontSize: 9.5, fontWeight: 800, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 2, letterSpacing: 0.6 }}>MATRIC</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
         {/* Center Header Details */}
@@ -312,7 +312,7 @@ export default function JaySatyanarayanPreview({ data }) {
           style={{
             position: 'absolute',
             left: 838,
-            top: 410,
+            top: 446,
             fontSize: 7.5,
             fontWeight: 700,
             fontFamily: SANS,

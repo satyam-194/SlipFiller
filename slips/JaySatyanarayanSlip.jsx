@@ -52,7 +52,7 @@ const S = StyleSheet.create({
     lineHeight: 1,
   },
   sideMatric: {
-    fontSize: 9.5,
+    fontSize: 11.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -60,7 +60,7 @@ const S = StyleSheet.create({
     letterSpacing: 0.6,
   },
   sideTon: {
-    fontSize: 9.5,
+    fontSize: 11.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -201,7 +201,7 @@ const S = StyleSheet.create({
   credit: {
     position: 'absolute',
     left: 838,
-    top: 410,
+    top: 446,
     fontSize: 7.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,

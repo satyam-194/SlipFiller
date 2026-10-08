@@ -9,6 +9,10 @@ import MarutiSlip from './slips/MarutiSlip.jsx'
 import HarikrushnaSlip from './slips/HarikrushnaSlip.jsx'
 import ViratSlip from './slips/ViratSlip.jsx'
 import BhagwatiSlip from './slips/BhagwatiSlip.jsx'
+import SatyanarayanSlip from './slips/SatyanarayanSlip.jsx'
+import ShivSlip from './slips/ShivSlip.jsx'
+import MurlidharSlip from './slips/MurlidharSlip.jsx'
+import JaySatyanarayanSlip from './slips/JaySatyanarayanSlip.jsx'
 import { mmToPt } from './slips/printSpec.jsx'
 import SlipPreview from './SlipPreview.jsx'
 import JaynathPreview from './JaynathPreview.jsx'
@@ -19,17 +23,21 @@ import MarutiPreview from './MarutiPreview.jsx'
 import HarikrushnaPreview from './HarikrushnaPreview.jsx'
 import ViratPreview from './ViratPreview.jsx'
 import BhagwatiPreview from './BhagwatiPreview.jsx'
+import SatyanarayanPreview from './SatyanarayanPreview.jsx'
+import ShivPreview from './ShivPreview.jsx'
+import MurlidharPreview from './MurlidharPreview.jsx'
+import JaySatyanarayanPreview from './JaySatyanarayanPreview.jsx'
 
 const initialData = {
-  serialNo: '',
-  vehicleNo: '',
-  party: '',
-  material: '',
+  serialNo: '40079',
+  vehicleNo: 'GJ 03 BZ 0810',
+  party: 'SHREE GANESH TRADERS',
+  material: 'COAL',
   supplierName: '',
-  charges: '',
-  gross: '',
-  grossDate: '',
-  grossTime: '',
+  charges: '60',
+  gross: '1990',
+  grossDate: '2026-10-07',
+  grossTime: '11:58',
   tare: '',
   tareDate: '',
   tareTime: '',
@@ -139,6 +147,42 @@ const TEMPLATES = [
     labels: { serialNo: 'Serial No.', party: 'Party', material: 'Material' },
     Preview: BhagwatiPreview,
     Slip: BhagwatiSlip,
+  },
+  {
+    id: 'satyanarayan',
+    name: 'Shree Satyanarayan Weigh-Bridge (50 Ton)',
+    sub: 'Red/Pink slip • Samrat Ind. Area, Gondal Road, Rajkot',
+    color: '#b83344',
+    labels: { serialNo: 'RST NO.', party: 'Supplier', material: 'Material' },
+    Preview: SatyanarayanPreview,
+    Slip: SatyanarayanSlip,
+  },
+  {
+    id: 'shiv',
+    name: 'Shiv Weigh-Bridge',
+    sub: 'Red/Blue slip • Shapar (Veraval), Rajkot',
+    color: '#b82434',
+    labels: { serialNo: 'SERIAL No.', party: 'SUPPLIER', material: 'MATIRIAL' },
+    Preview: ShivPreview,
+    Slip: ShivSlip,
+  },
+  {
+    id: 'murlidhar',
+    name: 'Murlidhar Weigh-Bridge',
+    sub: 'Blue/Yellow slip • GIDC Metoda, Rajkot',
+    color: '#274492',
+    labels: { serialNo: 'SR. NO', party: 'RECEIVER', material: 'MATERIAL' },
+    Preview: MurlidharPreview,
+    Slip: MurlidharSlip,
+  },
+  {
+    id: 'jaysatyanarayan',
+    name: 'Shree Jay Satyanarayan Weigh-Bridge',
+    sub: 'Red/Pink slip • Vavdi, Gondal Road, Rajkot',
+    color: '#982435',
+    labels: { serialNo: 'RST NO.', party: 'SUPPLIER', material: 'MATERIAL' },
+    Preview: JaySatyanarayanPreview,
+    Slip: JaySatyanarayanSlip,
   },
 ]
 
@@ -298,7 +342,7 @@ function TemplateSelect({ templates, value, onSelect }) {
 
 export default function App() {
   const [data, setData] = useState(initialData)
-  const [templateId, setTemplateId] = useState('ambika')
+  const [templateId, setTemplateId] = useState('jaysatyanarayan')
   const [offsets, setOffsets] = useState(loadOffsets)
   const [debug, setDebug] = useState(false)
   const [busy, setBusy] = useState(false)
@@ -307,6 +351,7 @@ export default function App() {
   const { labels, Preview, Slip } = template
   const isJaynath = templateId === 'jaynath'
   const isKrishna = templateId === 'krishna'
+  const isMurlidhar = templateId === 'murlidhar'
 
   const off = offsets[templateId] || { x: 0, y: 0 }
   const setOff = (axis, raw) => {
@@ -466,7 +511,7 @@ export default function App() {
               <div><label className={labelClass}>{labels.material}</label><input className={inputClass} name="material" value={data.material} onChange={handleChange} placeholder="e.g. Sand" /></div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-              {(isJaynath || isKrishna) && (
+              {(isJaynath || isKrishna || isMurlidhar) && (
                 <div><label className={labelClass}>{isKrishna ? 'Buyer (ખરીદનાર)' : 'Supplier Name'}</label><input className={inputClass} name="supplierName" value={data.supplierName} onChange={handleChange} placeholder={isKrishna ? 'Buyer name' : 'Supplier name'} /></div>
               )}
               <div><label className={labelClass}>Charges (₹)</label><input className={inputClass} name="charges" value={data.charges} onChange={handleChange} placeholder="e.g. 180" /></div>

@@ -65,6 +65,13 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
+// GROSS / TARE / NET print as one right-aligned column ending at 425, 15pt
+// before the "Gross Date" / "Tare Date" / "Charges" label column at 440. These
+// figures print at 17pt (larger than the base val), so the column is 210pt wide
+// — room for a 6-digit weight. Right-aligning (rather than leaving them
+// left-aligned at 215) lines their last digits up whatever the digit count.
+const WT = { left: 215, width: 210, textAlign: 'right' }
+
 // mode: 'full' | 'blank' (stationery master) | 'values' (dot-matrix overlay)
 // offsetX/offsetY (pt): tractor-feed alignment nudge, values layer only
 export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
@@ -156,9 +163,9 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
             <Text style={[S.val, { left: 215, top: 134, color: vColor }]}>{data.serialNo || ' '}</Text>
             <Text style={[S.val, { left: 230, top: 162, color: vColor }]}>{data.party || ' '}</Text>
             <Text style={[S.val, { left: 215, top: 206, color: vColor }]}>{data.vehicleNo || ' '}</Text>
-            <Text style={[S.val, { left: 215, top: 249, fontSize: 17, color: vColor }]}>{data.gross || ' '}</Text>
-            <Text style={[S.val, { left: 215, top: 292, fontSize: 17, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, { left: 215, top: 335, fontSize: 17, color: vColor }]}>{data.net || ' '}</Text>
+            <Text style={[S.val, WT, { top: 249, fontSize: 17, color: vColor }]}>{data.gross || ' '}</Text>
+            <Text style={[S.val, WT, { top: 292, fontSize: 17, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, WT, { top: 335, fontSize: 17, color: vColor }]}>{data.net || ' '}</Text>
             <Text style={[S.val, { left: 585, top: 150, color: vColor }]}>{data.supplierName || ' '}</Text>
             <Text style={[S.val, { left: 585, top: 194, color: vColor }]}>{data.material || ' '}</Text>
             <Text style={[S.valNarrow, { left: 575, top: 240, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Text>

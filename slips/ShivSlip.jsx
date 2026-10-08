@@ -318,6 +318,11 @@ const fmtTime = (t) => {
   return t
 }
 
+// GROSS / TARE / NET share one right-aligned column ending at 330, 15pt before
+// the pre-printed "Kg." at 345. Right-aligning (rather than just shifting the
+// left edge) also lines up the figures' last digits regardless of digit count.
+const WT = { left: 170, width: 160, textAlign: 'right' }
+
 export default function ShivSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
@@ -460,17 +465,17 @@ export default function ShivSlip({ data, mode = 'full', offsetX = 0, offsetY = 0
             <Text style={[S.val, { left: 510, top: 192, color: vColor }]}>{data.material || ' '}</Text>
 
             {/* Row 4: GROSS, DATE, TIME */}
-            <Text style={[S.val, { left: 170, top: 232, color: vColor }]}>{data.gross || ' '}</Text>
+            <Text style={[S.val, WT, { top: 232, color: vColor }]}>{data.gross || ' '}</Text>
             <Text style={[S.val, { left: 480, top: 232, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
             <Text style={[S.val, { left: 710, top: 232, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 5: TARE, DATE, TIME */}
-            <Text style={[S.val, { left: 170, top: 270, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, WT, { top: 270, color: vColor }]}>{data.tare || ' '}</Text>
             <Text style={[S.val, { left: 480, top: 270, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
             <Text style={[S.val, { left: 710, top: 270, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
             {/* Row 6: NETT */}
-            <Text style={[S.val, { left: 170, top: 308, color: vColor }]}>{data.net || ' '}</Text>
+            <Text style={[S.val, WT, { top: 308, color: vColor }]}>{data.net || ' '}</Text>
           </View>
         )}
       </PrintPage>

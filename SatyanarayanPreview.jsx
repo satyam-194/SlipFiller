@@ -52,6 +52,11 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
+
+// GROSS / TARE / NET share one right-aligned column ending at 375, 15pt before
+// the next pre-printed label on the row. Mirrors WT in the matching PDF slip.
+const WT = { left: 150, width: 225, textAlign: 'right' }
+
 export default function SatyanarayanPreview({ data }) {
   const supplierValue = data.supplierName || data.party || ''
 
@@ -226,7 +231,7 @@ export default function SatyanarayanPreview({ data }) {
 
         {/* Row 3: GROSS, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 222 }}>GROSS :</div>
-        <div style={{ ...val, left: 150, top: 222 }}>{data.gross || ''}</div>
+        <div style={{ ...val, ...WT, top: 222 }}>{data.gross || ''}</div>
         <div style={{ ...lbl, left: 390, top: 222 }}>DATE :</div>
         <div style={{ ...val, left: 455, top: 222 }}>{fmtDate(data.grossDate) || ''}</div>
         <div style={{ ...lbl, left: 610, top: 222 }}>TIME :</div>
@@ -234,7 +239,7 @@ export default function SatyanarayanPreview({ data }) {
 
         {/* Row 4: TARE, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 264 }}>TARE  :</div>
-        <div style={{ ...val, left: 150, top: 264 }}>{data.tare || ''}</div>
+        <div style={{ ...val, ...WT, top: 264 }}>{data.tare || ''}</div>
         <div style={{ ...lbl, left: 390, top: 264 }}>DATE :</div>
         <div style={{ ...val, left: 455, top: 264 }}>{fmtDate(data.tareDate) || ''}</div>
         <div style={{ ...lbl, left: 610, top: 264 }}>TIME :</div>
@@ -242,7 +247,7 @@ export default function SatyanarayanPreview({ data }) {
 
         {/* Row 5: NET & Charges */}
         <div style={{ ...lbl, left: 36, top: 306 }}>NET   :</div>
-        <div style={{ ...val, left: 150, top: 306 }}>{data.net || ''}</div>
+        <div style={{ ...val, ...WT, top: 306 }}>{data.net || ''}</div>
         {data.charges ? (
           <div style={{ ...val, left: 550, top: 306 }}>
             {`Charges(Rs) :   ${data.charges}`}

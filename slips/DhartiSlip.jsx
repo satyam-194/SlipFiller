@@ -168,6 +168,13 @@ const COL = {
   time: 688, timeVal: 748, charges: 560, chargesVal: 686,
 }
 
+
+// GROSS / TARE / NET print as one right-aligned column ending at 389,
+// 15pt before the pre-printed "KG." at 404. Right-aligning (rather than
+// leaving them left-aligned at 200) lines the figures' last digits up with each
+// other and keeps a long weight from running into the label.
+const WT = { left: 200, width: 189, textAlign: 'right' }
+
 // Static half of a weigh row
 function WeighRowLabels({ y, icon, label, kg, date, time }) {
   return (
@@ -185,7 +192,7 @@ function WeighRowLabels({ y, icon, label, kg, date, time }) {
 function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
   return (
     <>
-      <Text style={[S.wVal, { left: COL.value, top: y - 7, color }]}>{value || ' '}</Text>
+      <Text style={[S.wVal, WT, { top: y - 7, color }]}>{value || ' '}</Text>
       {date && <Text style={[S.wVal, { left: COL.dateVal, top: y - 7, color }]}>{dateVal || ' '}</Text>}
       {time && <Text style={[S.tVal, { left: COL.timeVal, top: y - 6, color }]}>{timeVal || ' '}</Text>}
     </>

@@ -189,6 +189,14 @@ function CapacityBlock({ left, num, size }) {
   )
 }
 
+
+// GROSS / TARE / NET print as one right-aligned column ending at 271,
+// 15pt before the pre-printed "Kg." unit. The column starts at 128 — just
+// clear of the "GROSS :" label at 66 — so it is 143pt wide, enough for a
+// 6-digit weight at this slip's enlarged weight type. Right-aligning keeps the
+// figures' last digits in line whatever the digit count.
+const WT = { left: 128, width: 143, textAlign: 'right' }
+
 // Static half of a weigh row
 function WeighRowLabels({ y, icon, label, date, time }) {
   return (
@@ -206,7 +214,7 @@ function WeighRowLabels({ y, icon, label, date, time }) {
 function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
   return (
     <>
-      <Text style={[S.wVal, { left: COL.value, top: y - 10, color }]}>{value || ' '}</Text>
+      <Text style={[S.wVal, WT, { top: y - 10, color }]}>{value || ' '}</Text>
       {date && <Text style={[S.valNarrow, { left: COL.dateVal, top: y - 6, color }]}>{dateVal || ' '}</Text>}
       {time && <Text style={[S.valNarrow, { left: COL.timeVal, top: y - 6, color }]}>{timeVal || ' '}</Text>}
     </>

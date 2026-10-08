@@ -221,6 +221,16 @@ const S = StyleSheet.create({
   },
 })
 
+// GROSS / TARE / NET figures.
+//
+// These used to print left-aligned at x=150, which left a ~170pt void before
+// the pre-printed "DATE :" at x=390 and, because the values vary in length,
+// made their right edges ragged ("1990" and "200" ended 40pt apart).
+// Right-aligning the column puts every figure's last digit on a common edge
+// at 375, leaving a 15pt gap before the DATE label — the weights sit directly
+// to the left of the date, which is where the weighing software prints them.
+const WT = { left: 150, width: 225, textAlign: 'right' }
+
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
 
@@ -341,17 +351,17 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
             <Text style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Text>
 
             {/* Row 3 Values (GROSS) */}
-            <Text style={[S.val, { left: 150, top: 222, color: vColor }]}>{data.gross || ' '}</Text>
+            <Text style={[S.val, WT, { top: 222, color: vColor }]}>{data.gross || ' '}</Text>
             <Text style={[S.val, { left: 455, top: 222, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
             <Text style={[S.val, { left: 680, top: 222, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 4 Values (TARE) */}
-            <Text style={[S.val, { left: 150, top: 264, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, WT, { top: 264, color: vColor }]}>{data.tare || ' '}</Text>
             <Text style={[S.val, { left: 455, top: 264, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
             <Text style={[S.val, { left: 680, top: 264, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
             {/* Row 5 Values (NET & Charges) */}
-            <Text style={[S.val, { left: 150, top: 306, color: vColor }]}>{data.net || ' '}</Text>
+            <Text style={[S.val, WT, { top: 306, color: vColor }]}>{data.net || ' '}</Text>
             {data.charges ? (
               <Text style={[S.val, { left: 550, top: 306, color: vColor }]}>
                 {`Charges(Rs) :   ${data.charges}`}

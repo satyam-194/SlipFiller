@@ -41,6 +41,11 @@ const val = {
 // Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
 const valNarrow = { ...val, fontSize: 9.5, letterSpacing: 0.2 }
 
+// GROSS / TARE / NET share one right-aligned column ending at 375, so the
+// figures sit just left of "DATE :" (390) with a 15pt gap and their right
+// edges line up regardless of digit count. Mirrors WT in the PDF.
+const WT = { left: 150, width: 225, textAlign: 'right' }
+
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
 
@@ -227,7 +232,7 @@ export default function JaySatyanarayanPreview({ data }) {
 
         {/* Row 3: GROSS, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 222 }}>GROSS :</div>
-        <div style={{ ...val, left: 150, top: 222 }}>{data.gross || ''}</div>
+        <div style={{ ...val, ...WT, top: 222 }}>{data.gross || ''}</div>
         <div style={{ ...lbl, left: 390, top: 222 }}>DATE :</div>
         <div style={{ ...val, left: 455, top: 222 }}>{fmtDate(data.grossDate) || ''}</div>
         <div style={{ ...lbl, left: 610, top: 222 }}>TIME :</div>
@@ -235,7 +240,7 @@ export default function JaySatyanarayanPreview({ data }) {
 
         {/* Row 4: TARE, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 264 }}>TARE  :</div>
-        <div style={{ ...val, left: 150, top: 264 }}>{data.tare || ''}</div>
+        <div style={{ ...val, ...WT, top: 264 }}>{data.tare || ''}</div>
         <div style={{ ...lbl, left: 390, top: 264 }}>DATE :</div>
         <div style={{ ...val, left: 455, top: 264 }}>{fmtDate(data.tareDate) || ''}</div>
         <div style={{ ...lbl, left: 610, top: 264 }}>TIME :</div>
@@ -243,7 +248,7 @@ export default function JaySatyanarayanPreview({ data }) {
 
         {/* Row 5: NET & Charges */}
         <div style={{ ...lbl, left: 36, top: 306 }}>NET   :</div>
-        <div style={{ ...val, left: 150, top: 306 }}>{data.net || ''}</div>
+        <div style={{ ...val, ...WT, top: 306 }}>{data.net || ''}</div>
         {data.charges ? (
           <div style={{ ...val, left: 550, top: 306 }}>
             {`Charges(Rs) :   ${data.charges}`}

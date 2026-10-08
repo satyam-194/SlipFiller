@@ -133,6 +133,11 @@ function CapacityBlock({ left, width, num }) {
 
 // kgDy=14 puts "Kg. DATE :" a line below the row label (GROSS/TARE);
 // kgDy=0 keeps "Kg. :" on the same line (NET)
+
+// GROSS / TARE / NET: one right-aligned column ending at 285, starting at
+// 140 so a 6-digit weight fits. Mirrors WT in the matching PDF slip.
+const WT = { left: 140, width: 145, textAlign: 'right' }
+
 function WeighRowLabels({ y, icon, label, kgLabel, kgDy = 14 }) {
   return (
     <>
@@ -203,15 +208,15 @@ export default function ViratPreview({ data }) {
           <span style={{ ...lbl, left: COL.time, top: ROW.tare + 6 }}>TIME :</span>
 
           {/* Weight figures print above their row's label line */}
-          <span style={{ ...wVal, left: COL.value, top: ROW.gross - 30 }}>{data.gross}</span>
+          <span style={{ ...wVal, ...WT, top: ROW.gross - 30 }}>{data.gross}</span>
           <span style={{ ...val, left: COL.dateVal, top: ROW.gross - 14 }}>{fmtDate(data.grossDate)}</span>
           <span style={{ ...val, left: COL.timeVal, top: ROW.gross + 2 }}>{data.grossTime}</span>
 
-          <span style={{ ...wVal, left: COL.value, top: ROW.tare - 12 }}>{data.tare}</span>
+          <span style={{ ...wVal, ...WT, top: ROW.tare - 12 }}>{data.tare}</span>
           <span style={{ ...val, left: COL.dateVal, top: ROW.tare + 6 }}>{fmtDate(data.tareDate)}</span>
           <span style={{ ...val, left: COL.timeVal, top: ROW.tare + 6 }}>{data.tareTime}</span>
 
-          <span style={{ ...wVal, left: COL.value, top: ROW.net - 11 }}>{data.net}</span>
+          <span style={{ ...wVal, ...WT, top: ROW.net - 11 }}>{data.net}</span>
 
           {/* CHARGES label + amount both print from the weighing software */}
           {data.charges ? (

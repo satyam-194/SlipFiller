@@ -47,6 +47,11 @@ const fmtTime = (t) => {
   return t
 }
 
+
+// GROSS / TARE / NET share one right-aligned column ending at 330, 15pt before
+// the next pre-printed label on the row. Mirrors WT in the matching PDF slip.
+const WT = { left: 170, width: 160, textAlign: 'right' }
+
 export default function ShivPreview({ data }) {
   const supplierValue = data.supplierName || data.party || ''
 
@@ -283,7 +288,7 @@ export default function ShivPreview({ data }) {
 
         {/* Row 4: GROSS, Kg., DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 232 }}>GROSS</div>
-        <div style={{ ...val, left: 170, top: 232 }}>{data.gross || ''}</div>
+        <div style={{ ...val, ...WT, top: 232 }}>{data.gross || ''}</div>
         <div style={{ ...lbl, left: 345, top: 232 }}>Kg.</div>
         <div style={{ ...lbl, left: 410, top: 232 }}>DATE</div>
         <div style={{ ...val, left: 480, top: 232 }}>{fmtDate(data.grossDate) || ''}</div>
@@ -292,7 +297,7 @@ export default function ShivPreview({ data }) {
 
         {/* Row 5: TARE, Kg., DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 270 }}>TARE</div>
-        <div style={{ ...val, left: 170, top: 270 }}>{data.tare || ''}</div>
+        <div style={{ ...val, ...WT, top: 270 }}>{data.tare || ''}</div>
         <div style={{ ...lbl, left: 345, top: 270 }}>Kg.</div>
         <div style={{ ...lbl, left: 410, top: 270 }}>DATE</div>
         <div style={{ ...val, left: 480, top: 270 }}>{fmtDate(data.tareDate) || ''}</div>
@@ -301,7 +306,7 @@ export default function ShivPreview({ data }) {
 
         {/* Row 6: NETT, Kg. */}
         <div style={{ ...lbl, left: 36, top: 308 }}>NETT</div>
-        <div style={{ ...val, left: 170, top: 308 }}>{data.net || ''}</div>
+        <div style={{ ...val, ...WT, top: 308 }}>{data.net || ''}</div>
         <div style={{ ...lbl, left: 345, top: 308 }}>Kg.</div>
 
         {/* ---- Footer Section ---- */}

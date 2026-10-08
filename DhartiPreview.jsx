@@ -107,12 +107,17 @@ const COL = {
   time: 688, timeVal: 748, charges: 560, chargesVal: 686,
 }
 
+
+// GROSS / TARE / NET share one right-aligned column ending at 389, 15pt before
+// the next pre-printed label on the row. Mirrors WT in the matching PDF slip.
+const WT = { left: 200, width: 189, textAlign: 'right' }
+
 function WeighRow({ y, icon, label, value, kg, date, dateVal, time, timeVal }) {
   return (
     <>
       <div style={{ position: 'absolute', left: COL.icon, top: y - 14 }}>{icon}</div>
       <span style={{ ...wLbl, left: COL.label, top: y - 7 }}>{label}</span>
-      <span style={{ ...wVal, left: COL.value, top: y - 7 }}>{value}</span>
+      <span style={{ ...wVal, ...WT, top: y - 7 }}>{value}</span>
       {kg && <span style={{ ...wLbl, left: COL.kg, top: y - 7 }}>KG.</span>}
       {date && <span style={{ ...wLbl, left: COL.date, top: y - 7 }}>DATE :</span>}
       {date && <span style={{ ...wVal, left: COL.dateVal, top: y - 7 }}>{dateVal}</span>}

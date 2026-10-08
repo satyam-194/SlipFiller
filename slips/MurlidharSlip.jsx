@@ -443,6 +443,12 @@ const fmtTime = (t) => {
   return t
 }
 
+// GROSS / TARE / NET share one right-aligned column ending at 293, 15pt before
+// the pre-printed "Kg." unit at 308 (NOT the "DATE :" at 345 — the Kg. comes
+// first on this slip). Right-aligning also lines the figures' last digits up
+// with each other regardless of digit count.
+const WT = { left: 165, width: 128, textAlign: 'right' }
+
 export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
@@ -600,17 +606,17 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
             <Text style={[S.val, { left: 635, top: 162, color: vColor }]}>{supplierValue || ' '}</Text>
 
             {/* Row 3: GROSS, DATE, TIME */}
-            <Text style={[S.val, { left: 165, top: 202, color: vColor }]}>{data.gross || ' '}</Text>
+            <Text style={[S.val, WT, { top: 202, color: vColor }]}>{data.gross || ' '}</Text>
             <Text style={[S.val, { left: 410, top: 202, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
             <Text style={[S.val, { left: 655, top: 202, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 4: TARE, DATE, TIME */}
-            <Text style={[S.val, { left: 165, top: 246, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, WT, { top: 246, color: vColor }]}>{data.tare || ' '}</Text>
             <Text style={[S.val, { left: 410, top: 246, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
             <Text style={[S.val, { left: 655, top: 246, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
             {/* Row 5: NET, MATERIAL */}
-            <Text style={[S.val, { left: 165, top: 290, color: vColor }]}>{data.net || ' '}</Text>
+            <Text style={[S.val, WT, { top: 290, color: vColor }]}>{data.net || ' '}</Text>
             <Text style={[S.val, { left: 645, top: 290, color: vColor }]}>{data.material || ' '}</Text>
           </View>
         )}

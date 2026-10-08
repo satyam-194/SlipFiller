@@ -233,6 +233,11 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
+// GROSS / TARE / NET share one right-aligned column ending at 375, 15pt before
+// the pre-printed "DATE :" at 390. Right-aligning (rather than just shifting the
+// left edge) also lines up the figures' last digits regardless of digit count.
+const WT = { left: 150, width: 225, textAlign: 'right' }
+
 export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
@@ -341,17 +346,17 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
             <Text style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Text>
 
             {/* Row 3 Values (GROSS) */}
-            <Text style={[S.val, { left: 150, top: 222, color: vColor }]}>{data.gross || ' '}</Text>
+            <Text style={[S.val, WT, { top: 222, color: vColor }]}>{data.gross || ' '}</Text>
             <Text style={[S.val, { left: 455, top: 222, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
             <Text style={[S.val, { left: 680, top: 222, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 4 Values (TARE) */}
-            <Text style={[S.val, { left: 150, top: 264, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, WT, { top: 264, color: vColor }]}>{data.tare || ' '}</Text>
             <Text style={[S.val, { left: 455, top: 264, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
             <Text style={[S.val, { left: 680, top: 264, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
             {/* Row 5 Values (NET & Charges) */}
-            <Text style={[S.val, { left: 150, top: 306, color: vColor }]}>{data.net || ' '}</Text>
+            <Text style={[S.val, WT, { top: 306, color: vColor }]}>{data.net || ' '}</Text>
             {data.charges ? (
               <Text style={[S.val, { left: 550, top: 306, color: vColor }]}>
                 {`Charges(Rs) :   ${data.charges}`}

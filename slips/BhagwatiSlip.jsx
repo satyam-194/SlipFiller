@@ -196,6 +196,14 @@ function NettSquaresIcon() {
   )
 }
 
+
+// GROSS / TARE / NET print as one right-aligned column ending at 285,
+// 15pt before the pre-printed "Kg." unit. The column starts at 138 — just
+// clear of the "GROSS :" label at 76 — so it is 147pt wide, enough for a
+// 6-digit weight at this slip's enlarged weight type. Right-aligning keeps the
+// figures' last digits in line whatever the digit count.
+const WT = { left: 138, width: 147, textAlign: 'right' }
+
 // Static half of a weigh row
 function WeighRowLabels({ y, icon, label, kg, date, time, charge }) {
   return (
@@ -311,15 +319,15 @@ export default function BhagwatiSlip({ data, mode = 'full', offsetX = 0, offsetY
               <Text style={[S.vehicleVal, { left: R.vehicleValue, top: R.vehicle + 2, color: vColor }]}>{data.vehicleNo || ' '}</Text>
               <Text style={[S.val, { left: R.value, top: R.material - 1, color: vColor }]}>{data.material || ' '}</Text>
 
-              <Text style={[S.wVal, { left: COL.value, top: ROW.gross - 11, color: vColor }]}>{data.gross || ' '}</Text>
+              <Text style={[S.wVal, WT, { top: ROW.gross - 11, color: vColor }]}>{data.gross || ' '}</Text>
               <Text style={[S.valNarrow, { left: COL.dateVal, top: ROW.gross - 6, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
               <Text style={[S.valNarrow, { left: COL.timeVal, top: ROW.gross - 6, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
-              <Text style={[S.wVal, { left: COL.value, top: ROW.tare - 11, color: vColor }]}>{data.tare || ' '}</Text>
+              <Text style={[S.wVal, WT, { top: ROW.tare - 11, color: vColor }]}>{data.tare || ' '}</Text>
               <Text style={[S.valNarrow, { left: COL.dateVal, top: ROW.tare - 6, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
               <Text style={[S.valNarrow, { left: COL.timeVal, top: ROW.tare - 6, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
-              <Text style={[S.wVal, { left: COL.value, top: ROW.net - 11, color: vColor }]}>{data.net || ' '}</Text>
+              <Text style={[S.wVal, WT, { top: ROW.net - 11, color: vColor }]}>{data.net || ' '}</Text>
 
               {/* The weighing software prints its own "Charges(Rs):" caption
                   next to the pre-printed CHARGE label */}

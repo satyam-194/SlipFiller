@@ -68,12 +68,17 @@ function NetGridIcon() {
 const ROW = { gross: 112, tare: 155, net: 196 }
 const COL = { icon: 10, label: 62, value: 122, kg: 299, date: 341, dateVal: 392, time: 588, timeVal: 638, charges: 500, chargesVal: 610 }
 
+
+// GROSS / TARE / NET share one right-aligned column ending at 284, 15pt before
+// the next pre-printed label on the row. Mirrors WT in the matching PDF slip.
+const WT = { left: 122, width: 162, textAlign: 'right' }
+
 function WeighRow({ y, icon, label, value, kg, date, dateVal, time, timeVal }) {
   return (
     <>
       <div style={{ position: 'absolute', left: COL.icon, top: y - 14 }}>{icon}</div>
       <span style={{ ...wLbl, left: COL.label, top: y - 6 }}>{label}</span>
-      <span style={{ ...wVal, left: COL.value, top: y - 6 }}>{value}</span>
+      <span style={{ ...wVal, ...WT, top: y - 6 }}>{value}</span>
       {kg && <span style={{ ...wLbl, left: COL.kg, top: y - 6 }}>KG.</span>}
       {date && <span style={{ ...wLbl, left: COL.date, top: y - 6 }}>DATE :</span>}
       {date && <span style={{ ...wVal, left: COL.dateVal, top: y - 6 }}>{dateVal}</span>}

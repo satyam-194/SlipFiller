@@ -127,12 +127,17 @@ function CapacityBlock({ left, num, size }) {
   )
 }
 
+
+// GROSS / TARE / NET: one right-aligned column ending at 271, starting at
+// 128 so a 6-digit weight fits. Mirrors WT in the matching PDF slip.
+const WT = { left: 128, width: 143, textAlign: 'right' }
+
 function WeighRow({ y, icon, label, value, date, dateVal, time, timeVal }) {
   return (
     <>
       <div style={{ position: 'absolute', left: COL.icon, top: y - 13 }}>{icon}</div>
       <span style={{ ...lbl, left: COL.label, top: y - 7 }}>{label}</span>
-      <span style={{ ...wVal, left: COL.value, top: y - 10 }}>{value}</span>
+      <span style={{ ...wVal, ...WT, top: y - 10 }}>{value}</span>
       <span style={{ ...lbl, left: COL.kg, top: y - 7 }}>KG.</span>
       {date && <span style={{ ...lbl, left: COL.date, top: y - 7 }}>DATE :</span>}
       {date && <span style={{ ...val, left: COL.dateVal, top: y - 8 }}>{dateVal}</span>}

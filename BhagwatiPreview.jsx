@@ -119,6 +119,11 @@ function NettSquaresIcon() {
   )
 }
 
+
+// GROSS / TARE / NET: one right-aligned column ending at 285, starting at
+// 138 so a 6-digit weight fits. Mirrors WT in the matching PDF slip.
+const WT = { left: 138, width: 147, textAlign: 'right' }
+
 function WeighRowLabels({ y, icon, label, kg, date, time, charge }) {
   return (
     <>
@@ -228,15 +233,15 @@ export default function BhagwatiPreview({ data }) {
           <WeighRowLabels y={ROW.tare} icon={<TruckEmptyIcon />} label="TARE :" kg date time />
           <WeighRowLabels y={ROW.net} icon={<NettSquaresIcon />} label="NETT :" kg charge />
 
-          <span style={{ ...wVal, left: COL.value, top: ROW.gross - 11 }}>{data.gross}</span>
+          <span style={{ ...wVal, ...WT, top: ROW.gross - 11 }}>{data.gross}</span>
           <span style={{ ...valNarrow, left: COL.dateVal, top: ROW.gross - 6 }}>{fmtDate(data.grossDate)}</span>
           <span style={{ ...valNarrow, left: COL.timeVal, top: ROW.gross - 6 }}>{fmtTime(data.grossTime)}</span>
 
-          <span style={{ ...wVal, left: COL.value, top: ROW.tare - 11 }}>{data.tare}</span>
+          <span style={{ ...wVal, ...WT, top: ROW.tare - 11 }}>{data.tare}</span>
           <span style={{ ...valNarrow, left: COL.dateVal, top: ROW.tare - 6 }}>{fmtDate(data.tareDate)}</span>
           <span style={{ ...valNarrow, left: COL.timeVal, top: ROW.tare - 6 }}>{fmtTime(data.tareTime)}</span>
 
-          <span style={{ ...wVal, left: COL.value, top: ROW.net - 11 }}>{data.net}</span>
+          <span style={{ ...wVal, ...WT, top: ROW.net - 11 }}>{data.net}</span>
 
           {/* The weighing software prints its own "Charges(Rs):" caption */}
           {data.charges ? (

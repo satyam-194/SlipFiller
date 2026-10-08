@@ -37,6 +37,10 @@ const DECO = "'Deco', 'Arial Black', sans-serif"
 const sideSmall = { fontSize: 8.6, fontWeight: 700, fontFamily: SANS, color: '#fff', textAlign: 'center', lineHeight: 1.25 }
 
 // Solid blue square with thin white keyline inset and white text
+// GROSS / TARE / NET: one right-aligned column ending at 425, 15pt before the
+// date/charges label column at 440. Mirrors WT in slips/JaynathSlip.jsx.
+const WT = { left: 215, width: 210, textAlign: 'right' }
+
 function SideBox({ left, children }) {
   return (
     <div style={{ position: 'absolute', left, top: 24, width: 92, height: 92, backgroundColor: INK, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
@@ -99,11 +103,11 @@ export default function JaynathPreview({ data }) {
         <span style={{ ...lbl, left: 80, top: 208 }}>Vehicle No.</span>
         <span style={{ ...val, left: 215, top: 206 }}>{data.vehicleNo}</span>
         <span style={{ ...lbl, left: 80, top: 251 }}>Gross WT.</span>
-        <span style={{ ...val, left: 215, top: 249, fontSize: 17 }}>{data.gross}</span>
+        <span style={{ ...val, ...WT, top: 249, fontSize: 17 }}>{data.gross}</span>
         <span style={{ ...lbl, left: 80, top: 294 }}>Tare WT.</span>
-        <span style={{ ...val, left: 215, top: 292, fontSize: 17 }}>{data.tare}</span>
+        <span style={{ ...val, ...WT, top: 292, fontSize: 17 }}>{data.tare}</span>
         <span style={{ ...lbl, left: 80, top: 337 }}>Net WT.</span>
-        <span style={{ ...val, left: 215, top: 335, fontSize: 17 }}>{data.net}</span>
+        <span style={{ ...val, ...WT, top: 335, fontSize: 17 }}>{data.net}</span>
 
         {/* Right column */}
         <span style={{ ...lbl, left: 440, top: 152 }}>Supplier Name :</span>

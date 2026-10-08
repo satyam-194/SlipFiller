@@ -105,6 +105,11 @@ const fmtTime = (t) => {
   return t
 }
 
+
+// GROSS / TARE / NET share one right-aligned column ending at 293, 15pt before
+// the pre-printed "Kg." unit at 308. Mirrors WT in the matching PDF slip.
+const WT = { left: 165, width: 128, textAlign: 'right' }
+
 export default function MurlidharPreview({ data }) {
   const receiverValue = data.party || data.receiver || ''
   const supplierValue = data.supplierName || ''
@@ -383,7 +388,7 @@ export default function MurlidharPreview({ data }) {
           <MurlidharTruckLoaded />
         </div>
         <div style={{ ...lbl, left: 92, top: 202, fontSize: 14 }}>GROSS</div>
-        <div style={{ ...val, left: 165, top: 202, fontSize: 14 }}>{data.gross || ''}</div>
+        <div style={{ ...val, ...WT, top: 202, fontSize: 14 }}>{data.gross || ''}</div>
         <div style={{ ...lbl, left: 308, top: 202, fontSize: 13 }}>Kg.</div>
         <div style={{ ...lbl, left: 345, top: 202, fontSize: 13 }}>DATE :</div>
         <div style={{ ...val, left: 410, top: 202 }}>{fmtDate(data.grossDate) || ''}</div>
@@ -395,7 +400,7 @@ export default function MurlidharPreview({ data }) {
           <MurlidharTruckEmpty />
         </div>
         <div style={{ ...lbl, left: 92, top: 246, fontSize: 14 }}>TARE</div>
-        <div style={{ ...val, left: 165, top: 246, fontSize: 14 }}>{data.tare || ''}</div>
+        <div style={{ ...val, ...WT, top: 246, fontSize: 14 }}>{data.tare || ''}</div>
         <div style={{ ...lbl, left: 308, top: 246, fontSize: 13 }}>Kg.</div>
         <div style={{ ...lbl, left: 345, top: 246, fontSize: 13 }}>DATE :</div>
         <div style={{ ...val, left: 410, top: 246 }}>{fmtDate(data.tareDate) || ''}</div>
@@ -407,7 +412,7 @@ export default function MurlidharPreview({ data }) {
           <MurlidharNetIcon />
         </div>
         <div style={{ ...lbl, left: 92, top: 290, fontSize: 14 }}>NET</div>
-        <div style={{ ...val, left: 165, top: 290, fontSize: 14 }}>{data.net || ''}</div>
+        <div style={{ ...val, ...WT, top: 290, fontSize: 14 }}>{data.net || ''}</div>
         <div style={{ ...lbl, left: 308, top: 290, fontSize: 13 }}>Kg.</div>
         <div style={{ ...lbl, left: 540, top: 290, fontSize: 13 }}>MATERIAL :</div>
         <div style={{ ...val, left: 645, top: 290 }}>{data.material || ''}</div>

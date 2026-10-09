@@ -9,7 +9,10 @@ import murlidharWordmark from '../murlidharWordmark.js'
 const BLUE = '#244594'         // Royal/Cobalt Blue press ink
 const GOLD = '#cca028'         // Mustard/Amber Gold banner fill
 const CREAM = '#f9eb82'        // Soft light yellow tint for header & rules
-const VAL = '#1a1a1a'          // Charcoal for dot-matrix values
+// Typed-value ink, same worn-ribbon grey as the Ambika slip: the weighbridge
+// printer lays down a light neutral grey, not black, and a laser printer
+// renders a pale tone darker than nominal. Raise toward #b0b0b0 to lighten.
+const VAL = '#a0a0a0'
 
 const PAGE_W = 850
 const PAGE_H = 458
@@ -452,11 +455,27 @@ const fmtTime = (t) => {
 // with each other regardless of digit count.
 const WT = { left: 165, width: 128, textAlign: 'right' }
 
+// Registration of the whole values layer against the pre-printed paper, the
+// same mechanism the Ambika slip uses. These are local to this template, so
+// tuning them cannot affect any other slip.
+//
+// These two numbers are the ONLY place registration is corrected here. Do not
+// nudge an individual field to stop it overlapping a label in the on-screen
+// 'full' preview: that silently cancels part of this shift, and the preview's
+// labels are not what the values land on — the pre-printed paper's are. A
+// collision in the preview is expected and harmless; only the printed 'values'
+// overlay matters. Raise FIT_Y to move values down, lower FIT_X to move left.
+const FIT_X = -124
+const FIT_Y = 0
+
 export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  const vColor = isValues ? '#000000' : VAL
+  // Same faded-ribbon grey in every mode. This used to force pure black in
+  // 'values' mode — the one mode that actually prints on the pre-printed
+  // paper — so printed values came out far darker than the real machine's.
+  const vColor = VAL
 
   const receiverValue = data.party || data.receiver || ''
   const supplierValue = data.supplierName || ''
@@ -598,14 +617,18 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
 
         {/* Dynamic Values Layer (Dot-matrix overlay) */}
         {showValues && (
-          <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
+          <View style={{ position: 'absolute', left: FIT_X + offsetX, top: FIT_Y + offsetY, width: PAGE_W, height: PAGE_H }}>
             {/* Row 1: SR. NO, CHARGES, VEHICLE No. */}
-            <Text style={[S.val, { left: 98, top: 134, color: vColor }]}>{data.serialNo || ' '}</Text>
+            {/* Held back from the measured column: with FIT_X applied, 98
+                would start at x=-26 and the leading digit prints off the
+                paper. 148 keeps a 24pt margin. */}
+            <Text style={[S.val, { left: 148, top: 134, color: vColor }]}>{data.serialNo || ' '}</Text>
             <Text style={[S.val, { left: 418, top: 134, color: vColor }]}>{data.charges || ' '}</Text>
             <Text style={[S.valNarrow, { left: 650, top: 136, color: vColor }]}>{data.vehicleNo || ' '}</Text>
 
             {/* Row 2: RECEIVER, SUPPLIER */}
-            <Text style={[S.val, { left: 118, top: 162, color: vColor }]}>{receiverValue || ' '}</Text>
+            {/* Same reason as the serial above: 118 would start at x=-6. */}
+            <Text style={[S.val, { left: 148, top: 162, color: vColor }]}>{receiverValue || ' '}</Text>
             <Text style={[S.val, { left: 635, top: 162, color: vColor }]}>{supplierValue || ' '}</Text>
 
             {/* Row 3: GROSS, DATE, TIME */}

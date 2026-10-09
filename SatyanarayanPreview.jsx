@@ -3,9 +3,9 @@ import SlipScaler from './SlipScaler.jsx'
 import satyanarayanTitle, { satyanarayanTitleAspect } from './satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg (same as JaySatyanarayan)
-const INK = '#982435'          // Deep crimson/maroon press ink sampled from scan
-const HEADER_BG = '#f0bcc5'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f0bcc5'    // Soft dusty pink screened tint for footer band
+const INK = '#c25560'          // Light red press ink sampled from slip photo
+const HEADER_BG = '#f4c8d0'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#f4c8d0'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white background for center container
 const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
@@ -53,9 +53,9 @@ const fmtTime = (t) => {
 }
 
 
-// GROSS / TARE / NET share one right-aligned column ending at 375, 15pt before
+// GROSS / TARE / NET share one right-aligned column ending at 330, 15pt before
 // the next pre-printed label on the row. Mirrors WT in the matching PDF slip.
-const WT = { left: 150, width: 225, textAlign: 'right' }
+const WT = { left: 150, width: 180, textAlign: 'right' }
 
 export default function SatyanarayanPreview({ data }) {
   const supplierValue = data.supplierName || data.party || ''
@@ -161,7 +161,7 @@ export default function SatyanarayanPreview({ data }) {
           />
           <div
             style={{
-              fontSize: 11,
+              fontSize: 12,
               fontWeight: 700,
               fontFamily: SANS,
               color: INK,
@@ -175,7 +175,7 @@ export default function SatyanarayanPreview({ data }) {
           </div>
           <div
             style={{
-              fontSize: 10.5,
+              fontSize: 11.5,
               fontWeight: 700,
               fontFamily: SANS,
               color: INK,
@@ -232,7 +232,7 @@ export default function SatyanarayanPreview({ data }) {
         {/* Row 3: GROSS, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 222 }}>GROSS :</div>
         <div style={{ ...val, ...WT, top: 222 }}>{data.gross || ''}</div>
-        <div style={{ ...lbl, left: 390, top: 222 }}>DATE :</div>
+        <div style={{ ...lbl, left: 345, top: 222 }}>DATE :</div>
         <div style={{ ...val, left: 455, top: 222 }}>{fmtDate(data.grossDate) || ''}</div>
         <div style={{ ...lbl, left: 610, top: 222 }}>TIME :</div>
         <div style={{ ...val, left: 680, top: 222 }}>{fmtTime(data.grossTime) || ''}</div>
@@ -240,7 +240,7 @@ export default function SatyanarayanPreview({ data }) {
         {/* Row 4: TARE, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 264 }}>TARE  :</div>
         <div style={{ ...val, ...WT, top: 264 }}>{data.tare || ''}</div>
-        <div style={{ ...lbl, left: 390, top: 264 }}>DATE :</div>
+        <div style={{ ...lbl, left: 345, top: 264 }}>DATE :</div>
         <div style={{ ...val, left: 455, top: 264 }}>{fmtDate(data.tareDate) || ''}</div>
         <div style={{ ...lbl, left: 610, top: 264 }}>TIME :</div>
         <div style={{ ...val, left: 680, top: 264 }}>{fmtTime(data.tareTime) || ''}</div>
@@ -256,7 +256,10 @@ export default function SatyanarayanPreview({ data }) {
 
         {/* ---- Footer Section (Same Pink Background Color as Header) ---- */}
         {/* Gujarati Conditions (5 bullets) */}
-        <div style={{ position: 'absolute', left: 24, top: 355, display: 'flex', flexDirection: 'column', gap: 1 }}>
+        {/* Pinned to the bottom border (inner edge y=444) with ~6px padding,
+            like the original slip. Anchoring with `bottom` keeps the block's
+            last line at the border regardless of line-height differences. */}
+        <div style={{ position: 'absolute', left: 24, bottom: 20, display: 'flex', flexDirection: 'column', gap: 1 }}>
           <span style={{ fontSize: 11, fontFamily: GUJ, fontWeight: 500, color: INK, whiteSpace: 'nowrap' }}>
             * વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.
           </span>
@@ -279,7 +282,7 @@ export default function SatyanarayanPreview({ data }) {
           style={{
             position: 'absolute',
             left: 540,
-            top: 412,
+            bottom: 20,
             fontSize: 12.5,
             fontWeight: 700,
             fontFamily: SANS,
@@ -308,7 +311,7 @@ export default function SatyanarayanPreview({ data }) {
             boxSizing: 'border-box',
           }}
         >
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: INK, lineHeight: 1 }}>Sevice</span>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: INK, lineHeight: 1 }}>Service</span>
           <span style={{ fontSize: 28, fontWeight: 900, color: INK, lineHeight: 1, margin: '2px 0' }}>24</span>
           <span style={{ fontSize: 11, fontWeight: 700, color: INK, lineHeight: 1 }}>Hours</span>
         </div>

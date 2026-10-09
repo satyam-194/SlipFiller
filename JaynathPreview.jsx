@@ -2,6 +2,7 @@ import React from 'react'
 import SlipScaler from './SlipScaler.jsx'
 import jaynathTitle from './jaynathTitle.js'
 import jaynathWatermark from './jaynathWatermark.js'
+import jaynathFully from './jaynathFully.js'
 
 // Same palette + geometry as JaynathPDF.jsx (1pt = 1px here)
 const INK = '#3c5490'
@@ -81,13 +82,21 @@ const fmtTime = (t) => {
 // sites below keep reading as "the date column".
 const valNarrow = val
 
-const DECO = "'Deco', 'Arial Black', sans-serif"
 const sideSmall = { fontSize: 8.6, fontWeight: 700, fontFamily: SANS, color: '#fff', textAlign: 'center', lineHeight: 1.25 }
 
 // Solid blue square with thin white keyline inset and white text
 // GROSS / TARE / NET: one right-aligned column ending at 425, 15pt before the
 // date/charges label column at 440. Mirrors WT in slips/JaynathSlip.jsx.
-const WT = { left: 215, width: 210, textAlign: 'right' }
+const WT = { left: 215 - 62, width: 210, textAlign: 'right' }
+
+// Label column origins — mirrors slips/JaynathSlip.jsx. Left column hard
+// against the border (was 80); right-hand block pulled in to the middle of the
+// slip (was 440). Values travel with their labels via the same deltas.
+const LEFT_LBL = 18
+const MID_LBL = 400
+const MID_COLON = MID_LBL + 108
+const LEFT_DX = LEFT_LBL - 80
+const MID_DX = MID_LBL - 440
 
 function SideBox({ left, children }) {
   return (
@@ -116,18 +125,24 @@ export default function JaynathPreview({ data }) {
         <span style={{ ...guj, fontSize: 7, left: 420, top: 6 }}>॥ શ્રી શક્તિ કૃપા ॥</span>
         <span style={{ ...guj, fontSize: 7, left: 690, top: 6 }}>॥ જય માતાજી ॥</span>
 
-        {/* 50 box */}
-        <SideBox left={74}>
-          <span style={{ fontSize: 42, fontFamily: DECO, color: '#fff', lineHeight: 1 }}>50</span>
-          <div style={{ ...sideSmall, marginTop: 3 }}>METRIC TONS</div>
-          <div style={sideSmall}>COMPUTERIESD</div>
+        {/* 50 box — hard into the top-left corner of the header band, matching
+            JaynathSlip.jsx. The band spans x=8..842, so x=12 clears only the
+            1.5pt border. Keep this in step with the PDF: the two files carry
+            separate copies of these coordinates. */}
+        <SideBox left={12}>
+          <span style={{ fontSize: 42, fontWeight: 700, fontFamily: SANS, color: '#fff', lineHeight: 1 }}>50</span>
+          <div style={{ ...sideSmall, fontSize: 10, marginTop: 5 }}>METRIC TONS</div>
+          <div style={{ ...sideSmall, fontSize: 10, marginTop: 1 }}>COMPUTERISED</div>
         </SideBox>
 
-        {/* 24 box */}
-        <SideBox left={712}>
-          <div style={{ ...sideSmall, fontSize: 10 }}>SERVICE</div>
-          <span style={{ fontSize: 38, fontFamily: DECO, color: '#fff', lineHeight: 1 }}>24</span>
-          <div style={{ ...sideSmall, fontSize: 10 }}>HOURS</div>
+        {/* 24 box — mirrored into the top-right corner: 842 - 92 - 4 = 746. */}
+        <SideBox left={746}>
+          {/* Absolutely placed, not stacked — see slips/JaynathSlip.jsx for
+              why: stacked line boxes resolved differently in the PDF and
+              clipped HOURS through the bottom keyline when printed. */}
+          <div style={{ ...sideSmall, position: 'absolute', left: 0, right: 0, top: 9, fontSize: 15, lineHeight: 1 }}>SERVICE</div>
+          <span style={{ position: 'absolute', left: 0, right: 0, top: 22, fontSize: 46, fontWeight: 700, fontFamily: SANS, color: '#fff', lineHeight: 1, textAlign: 'center' }}>24</span>
+          <div style={{ ...sideSmall, position: 'absolute', left: 0, right: 0, top: 68, fontSize: 14, lineHeight: 1 }}>HOURS</div>
         </SideBox>
 
         {/* Header center */}
@@ -144,47 +159,49 @@ export default function JaynathPreview({ data }) {
         <img src={jaynathWatermark} alt="" style={{ position: 'absolute', left: 190, top: 181, width: 480, height: 113.4 }} />
 
         {/* Left column */}
-        <span style={{ ...lbl, left: 80, top: 136 }}>Ticket No.</span>
-        <span style={{ ...val, left: 215, top: 142 }}>{data.serialNo}</span>
-        <span style={{ ...lbl, left: 80, top: 164 }}>Customer Name :</span>
-        <span style={{ ...val, left: 230, top: 170 }}>{data.party}</span>
-        <span style={{ ...lbl, left: 80, top: 208 }}>Vehicle No.</span>
-        <span style={{ ...val, left: 215, top: 214 }}>{data.vehicleNo}</span>
-        <span style={{ ...lbl, left: 80, top: 251 }}>Gross WT.</span>
+        <span style={{ ...lbl, left: LEFT_LBL, top: 136 }}>Ticket No.</span>
+        <span style={{ ...val, left: 215 + LEFT_DX, top: 142 }}>{data.serialNo}</span>
+        <span style={{ ...lbl, left: LEFT_LBL, top: 164 }}>Customer Name :</span>
+        <span style={{ ...val, left: 230 + LEFT_DX, top: 170 }}>{data.party}</span>
+        <span style={{ ...lbl, left: LEFT_LBL, top: 208 }}>Vehicle No.</span>
+        <span style={{ ...val, left: 215 + LEFT_DX, top: 214 }}>{data.vehicleNo}</span>
+        <span style={{ ...lbl, left: LEFT_LBL, top: 251 }}>Gross WT.</span>
         <span style={{ ...val, ...WT, top: 257 }}>{data.gross}</span>
-        <span style={{ ...lbl, left: 80, top: 294 }}>Tare WT.</span>
+        <span style={{ ...lbl, left: LEFT_LBL, top: 294 }}>Tare WT.</span>
         <span style={{ ...val, ...WT, top: 300 }}>{data.tare}</span>
-        <span style={{ ...lbl, left: 80, top: 337 }}>Net WT.</span>
+        <span style={{ ...lbl, left: LEFT_LBL, top: 337 }}>Net WT.</span>
         <span style={{ ...val, ...WT, top: 343 }}>{data.net}</span>
 
         {/* Right column */}
-        <span style={{ ...lbl, left: 440, top: 152 }}>Supplier Name :</span>
-        <span style={{ ...val, left: 585, top: 158 }}>{data.supplierName}</span>
-        <span style={{ ...lbl, left: 440, top: 196 }}>Item</span>
-        <span style={{ ...lbl, left: 497, top: 196 }}>Name :</span>
-        <span style={{ ...val, left: 585, top: 202 }}>{data.material}</span>
-        <span style={{ ...lbl, left: 440, top: 240 }}>Gross Date</span>
-        <span style={{ ...lbl, left: 548, top: 240 }}>:</span>
-        <span style={{ ...valNarrow, left: 575, top: 246 }}>{fmtDateSlash(data.grossDate)}</span>
-        <span style={{ ...valNarrow, left: 700, top: 246 }}>{fmtTime(data.grossTime)}</span>
-        <span style={{ ...lbl, left: 440, top: 282 }}>Tare Date</span>
-        <span style={{ ...lbl, left: 548, top: 282 }}>:</span>
-        <span style={{ ...valNarrow, left: 575, top: 288 }}>{fmtDateSlash(data.tareDate)}</span>
-        <span style={{ ...valNarrow, left: 700, top: 288 }}>{fmtTime(data.tareTime)}</span>
-        <span style={{ ...lbl, left: 440, top: 324 }}>Charges</span>
-        <span style={{ ...lbl, left: 548, top: 324 }}>:</span>
-        <span style={{ ...val, left: 700, top: 330 }}>{fmtCharges(data.charges)}</span>
+        <span style={{ ...lbl, left: MID_LBL, top: 152 }}>Supplier Name :</span>
+        <span style={{ ...val, left: 585 + MID_DX, top: 158 }}>{data.supplierName}</span>
+        <span style={{ ...lbl, left: MID_LBL, top: 196 }}>Item</span>
+        <span style={{ ...lbl, left: MID_LBL + 57, top: 196 }}>Name :</span>
+        <span style={{ ...val, left: 585 + MID_DX, top: 202 }}>{data.material}</span>
+        <span style={{ ...lbl, left: MID_LBL, top: 240 }}>Gross Date</span>
+        <span style={{ ...lbl, left: MID_COLON, top: 240 }}>:</span>
+        <span style={{ ...valNarrow, left: 575 + MID_DX, top: 246 }}>{fmtDateSlash(data.grossDate)}</span>
+        <span style={{ ...valNarrow, left: 700 + MID_DX, top: 246 }}>{fmtTime(data.grossTime)}</span>
+        <span style={{ ...lbl, left: MID_LBL, top: 282 }}>Tare Date</span>
+        <span style={{ ...lbl, left: MID_COLON, top: 282 }}>:</span>
+        <span style={{ ...valNarrow, left: 575 + MID_DX, top: 288 }}>{fmtDateSlash(data.tareDate)}</span>
+        <span style={{ ...valNarrow, left: 700 + MID_DX, top: 288 }}>{fmtTime(data.tareTime)}</span>
+        <span style={{ ...lbl, left: MID_LBL, top: 324 }}>Charges</span>
+        <span style={{ ...lbl, left: MID_COLON, top: 324 }}>:</span>
+        <span style={{ ...val, left: 700 + MID_DX, top: 330 }}>{fmtCharges(data.charges)}</span>
 
         <div style={{ position: 'absolute', left: 8, top: 354, width: PAGE_W - 16, height: 1.5, backgroundColor: INK }} />
 
         {/* Gujarati notes (inside the bottom box) */}
-        <span style={{ ...guj, left: 80, top: 360 }}>(૧) વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</span>
-        <span style={{ ...guj, left: 80, top: 379 }}>(૨) વજન થઈ ગયા પછી અમારી કોઈપણ જાતની જવાબદારી રહેતી નથી.</span>
-        <span style={{ ...guj, left: 80, top: 398 }}>(૩) ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતો નથી.</span>
+        <span style={{ ...guj, left: LEFT_LBL, top: 358 }}>(૧) વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</span>
+        <span style={{ ...guj, left: LEFT_LBL, top: 375 }}>(૨) વજન થઈ ગયા પછી અમારી કોઈપણ જાતની જવાબદારી રહેતી નથી.</span>
+        <span style={{ ...guj, left: LEFT_LBL, top: 392 }}>(૩) ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતો નથી.</span>
 
-        <span style={{ position: 'absolute', left: 728, top: 398, fontSize: 10.5, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap' }}>Operator's Signature</span>
-        <span style={{ position: 'absolute', left: 350, top: 404, fontSize: 14.5, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap' }}>FULLY COMPUTERRISED WEIGH BRIDGE</span>
-        <span style={{ position: 'absolute', left: 80, top: 428, fontSize: 11.5, fontFamily: SANS, color: INK, whiteSpace: 'nowrap' }}>Subject to Rajkot Jurisdiction.</span>
+        <span style={{ position: 'absolute', left: 728, top: 392, fontSize: 10.5, fontWeight: 700, fontFamily: SANS, color: INK, whiteSpace: 'nowrap' }}>Operator's Signature</span>
+        {/* Strapline artwork — keep in step with slips/JaynathSlip.jsx, which
+            carries its own copy of these coordinates. */}
+        <img src={jaynathFully} alt="FULLY COMPUTERRISED WEIGH BRIDGE" style={{ position: 'absolute', left: 220, top: 409, width: 290, height: 290 / 20.755, display: 'block' }} />
+        <span style={{ position: 'absolute', left: LEFT_LBL, top: 427, fontSize: 11.5, fontFamily: SANS, color: INK, whiteSpace: 'nowrap' }}>Subject to Rajkot Jurisdiction.</span>
 
       </div>
     </SlipScaler>

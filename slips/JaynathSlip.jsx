@@ -3,6 +3,7 @@ import { Document, Text, View, StyleSheet, Image } from '@react-pdf/renderer'
 import '../fonts.js'
 import jaynathTitle from '../jaynathTitle.js'
 import jaynathWatermark from '../jaynathWatermark.js'
+import jaynathFully from '../jaynathFully.js'
 import PrintPage from './printSpec.jsx'
 
 // Palette sampled from the original JAYNATH slip photo (normalized for clean print)
@@ -27,8 +28,11 @@ const S = StyleSheet.create({
     backgroundColor: INK, alignItems: 'center', justifyContent: 'center',
   },
   sideKeyline: { position: 'absolute', left: 2.5, top: 2.5, right: 2.5, bottom: 2.5, border: '1.2 solid #ffffff' },
-  sideNum: { fontSize: 42, fontFamily: 'Deco', color: '#ffffff', lineHeight: 1 },
-  sideNum24: { fontSize: 38, fontFamily: 'Deco', color: '#ffffff', lineHeight: 1 },
+  sideNum: { fontSize: 42, fontFamily: 'Helvetica-Bold', color: '#ffffff', lineHeight: 1 },
+  // The 24 is the dominant element on the real sign — its caps run 53.8% of
+  // the panel height, against 18% for SERVICE and HOURS. Vertical placement is
+  // handled by explicit `top` values at the call site, not by this style.
+  sideNum24: { fontSize: 46, fontFamily: 'Helvetica-Bold', color: '#ffffff', lineHeight: 1 },
   sideSmall: { fontSize: 8.6, fontFamily: 'Helvetica-Bold', color: '#ffffff', textAlign: 'center' },
 
   // header center — fixed positions so browser and PDF match exactly
@@ -110,7 +114,19 @@ function Val({ style, children }) {
 // print at the same size as every other value — the original shows no size
 // change here. Right-aligning (rather than leaving them left-aligned at 215)
 // lines their last digits up whatever the digit count.
-const WT = { left: 215, width: 210, textAlign: 'right' }
+const WT = { left: 215 - 62, width: 210, textAlign: 'right' }
+
+// Label column origins. The outer border sits at x=8 with a 1.5pt rule, so 18
+// puts the left column hard against it with a small breathing margin. The
+// right-hand block moves in to the middle of the slip; MID_COLON keeps the
+// colon's original 108pt offset from its label.
+const LEFT_LBL = 18
+const MID_LBL = 400
+const MID_COLON = MID_LBL + 108
+// Values travel with their labels, so the same deltas apply to the typed
+// fields below (old label origins were 80 and 440).
+const LEFT_DX = LEFT_LBL - 80
+const MID_DX = MID_LBL - 440
 
 // mode: 'full' | 'blank' (stationery master) | 'values' (dot-matrix overlay)
 // offsetX/offsetY (pt): tractor-feed alignment nudge, values layer only
@@ -138,20 +154,33 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
             <Text style={[S.blessing, { left: 420, top: 6 }]}>॥ શ્રી શક્તિ કૃપા ॥</Text>
             <Text style={[S.blessing, { left: 690, top: 6 }]}>॥ જય માતાજી ॥</Text>
 
-            {/* 50 METRIC TONS box (left): white 50 over solid blue */}
-            <View style={[S.sideBox, { left: 74 }]}>
+            {/* 50 METRIC TONS box: hard into the top-left corner of the header
+                band, as on the original. The band spans x=8..842, so x=12
+                leaves only the 1.5pt border plus a hairline. It used to sit at
+                x=74, floating 66pt inside the frame. */}
+            <View style={[S.sideBox, { left: 12 }]}>
               <View style={S.sideKeyline} />
               <Text style={S.sideNum}>50</Text>
-              <Text style={[S.sideSmall, { marginTop: 3 }]}>METRIC TONS</Text>
-              <Text style={S.sideSmall}>COMPUTERIESD</Text>
+              <Text style={[S.sideSmall, { fontSize: 10, marginTop: 5 }]}>METRIC TONS</Text>
+              <Text style={[S.sideSmall, { fontSize: 10, marginTop: 1 }]}>COMPUTERISED</Text>
             </View>
 
-            {/* SERVICE 24 HOURS box (right): white text over solid blue */}
-            <View style={[S.sideBox, { left: 712 }]}>
+            {/* SERVICE 24 HOURS box: mirrored into the top-right corner.
+                842 - 92 - 4 = 746. */}
+            <View style={[S.sideBox, { left: 746 }]}>
               <View style={S.sideKeyline} />
-              <Text style={[S.sideSmall, { fontSize: 10 }]}>SERVICE</Text>
-              <Text style={S.sideNum24}>24</Text>
-              <Text style={[S.sideSmall, { fontSize: 10 }]}>HOURS</Text>
+              {/* Each line is placed absolutely rather than stacked in the
+                  flex column. Stacking made the layout depend on three line
+                  boxes resolving the same way in react-pdf as in the browser,
+                  and they do not: the leading differs just enough that HOURS
+                  was pushed through the bottom keyline when printed. Fixed
+                  tops cannot drift. Positions follow the real sign's bands
+                  (SERVICE at 1%, 24 at 23%, HOURS at 82% of panel height),
+                  with sizes a little under the measured caps so nothing
+                  touches the frame. */}
+              <Text style={[S.sideSmall, { position: 'absolute', left: 0, right: 0, top: 9, fontSize: 15, lineHeight: 1 }]}>SERVICE</Text>
+              <Text style={[S.sideNum24, { position: 'absolute', left: 0, right: 0, top: 22, textAlign: 'center' }]}>24</Text>
+              <Text style={[S.sideSmall, { position: 'absolute', left: 0, right: 0, top: 68, fontSize: 14, lineHeight: 1 }]}>HOURS</Text>
             </View>
 
             {/* Header center */}
@@ -166,53 +195,59 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
             {/* Watermark (same lettering as the title) */}
             <Image src={jaynathWatermark} style={{ position: 'absolute', left: 190, top: 181, width: 480, height: 113.4 }} />
 
-            {/* Left column labels */}
-            <Text style={[S.lbl, { left: 80, top: 136 }]}>Ticket No.</Text>
-            <Text style={[S.lbl, { left: 80, top: 164 }]}>Customer Name :</Text>
-            <Text style={[S.lbl, { left: 80, top: 208 }]}>Vehicle No.</Text>
-            <Text style={[S.lbl, { left: 80, top: 251 }]}>Gross WT.</Text>
-            <Text style={[S.lbl, { left: 80, top: 294 }]}>Tare WT.</Text>
-            <Text style={[S.lbl, { left: 80, top: 337 }]}>Net WT.</Text>
+            {/* Left column labels — hard against the left border (x=8 plus the
+                1.5pt rule), as on the original. Was x=80. */}
+            <Text style={[S.lbl, { left: LEFT_LBL, top: 136 }]}>Ticket No.</Text>
+            <Text style={[S.lbl, { left: LEFT_LBL, top: 164 }]}>Customer Name :</Text>
+            <Text style={[S.lbl, { left: LEFT_LBL, top: 208 }]}>Vehicle No.</Text>
+            <Text style={[S.lbl, { left: LEFT_LBL, top: 251 }]}>Gross WT.</Text>
+            <Text style={[S.lbl, { left: LEFT_LBL, top: 294 }]}>Tare WT.</Text>
+            <Text style={[S.lbl, { left: LEFT_LBL, top: 337 }]}>Net WT.</Text>
 
-            {/* Right column labels */}
-            <Text style={[S.lbl, { left: 440, top: 152 }]}>Supplier Name :</Text>
-            <Text style={[S.lbl, { left: 440, top: 196 }]}>Item</Text>
-            <Text style={[S.lbl, { left: 497, top: 196 }]}>Name :</Text>
-            <Text style={[S.lbl, { left: 440, top: 240 }]}>Gross Date</Text>
-            <Text style={[S.lbl, { left: 548, top: 240 }]}>:</Text>
-            <Text style={[S.lbl, { left: 440, top: 282 }]}>Tare Date</Text>
-            <Text style={[S.lbl, { left: 548, top: 282 }]}>:</Text>
-            <Text style={[S.lbl, { left: 440, top: 324 }]}>Charges</Text>
-            <Text style={[S.lbl, { left: 548, top: 324 }]}>:</Text>
+            {/* Right column labels — pulled in to the middle of the slip. The
+                colon column keeps its offset from the label. Was x=440/548. */}
+            <Text style={[S.lbl, { left: MID_LBL, top: 152 }]}>Supplier Name :</Text>
+            <Text style={[S.lbl, { left: MID_LBL, top: 196 }]}>Item</Text>
+            <Text style={[S.lbl, { left: MID_LBL + 57, top: 196 }]}>Name :</Text>
+            <Text style={[S.lbl, { left: MID_LBL, top: 240 }]}>Gross Date</Text>
+            <Text style={[S.lbl, { left: MID_COLON, top: 240 }]}>:</Text>
+            <Text style={[S.lbl, { left: MID_LBL, top: 282 }]}>Tare Date</Text>
+            <Text style={[S.lbl, { left: MID_COLON, top: 282 }]}>:</Text>
+            <Text style={[S.lbl, { left: MID_LBL, top: 324 }]}>Charges</Text>
+            <Text style={[S.lbl, { left: MID_COLON, top: 324 }]}>:</Text>
 
             <View style={[S.rule, { top: 354 }]} />
 
             {/* Gujarati notes (inside the bottom box) */}
-            <Text style={[S.guj, { left: 80, top: 360 }]}>(૧) વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</Text>
-            <Text style={[S.guj, { left: 80, top: 379 }]}>(૨) વજન થઈ ગયા પછી અમારી કોઈપણ જાતની જવાબદારી રહેતી નથી.</Text>
-            <Text style={[S.guj, { left: 80, top: 398 }]}>(૩) ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતો નથી.</Text>
+            <Text style={[S.guj, { left: LEFT_LBL, top: 358 }]}>(૧) વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</Text>
+            <Text style={[S.guj, { left: LEFT_LBL, top: 375 }]}>(૨) વજન થઈ ગયા પછી અમારી કોઈપણ જાતની જવાબદારી રહેતી નથી.</Text>
+            <Text style={[S.guj, { left: LEFT_LBL, top: 392 }]}>(૩) ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતો નથી.</Text>
 
-            <Text style={[S.opSig, { left: 728, top: 398 }]}>Operator's Signature</Text>
-            <Text style={[S.fully, { left: 350, top: 404 }]}>FULLY COMPUTERRISED WEIGH BRIDGE</Text>
-            <Text style={[S.lat, { left: 80, top: 428 }]}>Subject to Rajkot Jurisdiction.</Text>
+            <Text style={[S.opSig, { left: 728, top: 392 }]}>Operator's Signature</Text>
+            {/* Strapline as artwork, not type: the original is set in the same
+                Art Deco display face as the masthead, which Helvetica-Bold
+                could not match. Height is derived from the asset's own
+                20.755:1 ink aspect — keep them in that proportion. */}
+            <Image src={jaynathFully} style={{ position: 'absolute', left: 220, top: 409, width: 290, height: 290 / 20.755 }} />
+            <Text style={[S.lat, { left: LEFT_LBL, top: 427 }]}>Subject to Rajkot Jurisdiction.</Text>
           </>
         )}
 
         {showValues && (
           <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
-            <Val style={[S.val, { left: 215, top: 142, color: vColor }]}>{data.serialNo || ' '}</Val>
-            <Val style={[S.val, { left: 230, top: 170, color: vColor }]}>{data.party || ' '}</Val>
-            <Val style={[S.val, { left: 215, top: 214, color: vColor }]}>{data.vehicleNo || ' '}</Val>
+            <Val style={[S.val, { left: 215 + LEFT_DX, top: 142, color: vColor }]}>{data.serialNo || ' '}</Val>
+            <Val style={[S.val, { left: 230 + LEFT_DX, top: 170, color: vColor }]}>{data.party || ' '}</Val>
+            <Val style={[S.val, { left: 215 + LEFT_DX, top: 214, color: vColor }]}>{data.vehicleNo || ' '}</Val>
             <Val style={[S.val, WT, { top: 257, color: vColor }]}>{data.gross || ' '}</Val>
             <Val style={[S.val, WT, { top: 300, color: vColor }]}>{data.tare || ' '}</Val>
             <Val style={[S.val, WT, { top: 343, color: vColor }]}>{data.net || ' '}</Val>
-            <Val style={[S.val, { left: 585, top: 158, color: vColor }]}>{data.supplierName || ' '}</Val>
-            <Val style={[S.val, { left: 585, top: 202, color: vColor }]}>{data.material || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 575, top: 246, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 700, top: 246, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 575, top: 288, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 700, top: 288, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
-            <Val style={[S.val, { left: 700, top: 330, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Val>
+            <Val style={[S.val, { left: 585 + MID_DX, top: 158, color: vColor }]}>{data.supplierName || ' '}</Val>
+            <Val style={[S.val, { left: 585 + MID_DX, top: 202, color: vColor }]}>{data.material || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 575 + MID_DX, top: 246, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 700 + MID_DX, top: 246, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 575 + MID_DX, top: 288, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 700 + MID_DX, top: 288, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
+            <Val style={[S.val, { left: 700 + MID_DX, top: 330, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Val>
           </View>
         )}
 

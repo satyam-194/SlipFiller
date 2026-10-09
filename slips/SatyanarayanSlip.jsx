@@ -5,9 +5,9 @@ import PrintPage from './printSpec.jsx'
 import satyanarayanTitle, { satyanarayanTitleAspect } from '../satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg scan
-const INK = '#982435'          // Deep crimson red press ink
-const HEADER_BG = '#f0bcc5'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f0bcc5'    // Soft dusty pink screened tint for footer band
+const INK = '#c25560'          // Light red press ink sampled from slip photo
+const HEADER_BG = '#f4c8d0'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#f4c8d0'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white continuous paper for center container
 const VAL = '#1a1a1a'          // Dark charcoal for values
 
@@ -86,7 +86,7 @@ const S = StyleSheet.create({
     objectFit: 'contain',
   },
   address1: {
-    fontSize: 11,
+    fontSize: 12,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -94,7 +94,7 @@ const S = StyleSheet.create({
     letterSpacing: 0.2,
   },
   address2: {
-    fontSize: 10.5,
+    fontSize: 11.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -165,7 +165,7 @@ const S = StyleSheet.create({
   opSig: {
     position: 'absolute',
     left: 540,
-    top: 412,
+    bottom: 20,
     fontSize: 12.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
@@ -233,10 +233,10 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
-// GROSS / TARE / NET share one right-aligned column ending at 375, 15pt before
-// the pre-printed "DATE :" at 390. Right-aligning (rather than just shifting the
+// GROSS / TARE / NET share one right-aligned column ending at 330, 15pt before
+// the pre-printed "DATE :" at 345. Right-aligning (rather than just shifting the
 // left edge) also lines up the figures' last digits regardless of digit count.
-const WT = { left: 150, width: 225, textAlign: 'right' }
+const WT = { left: 150, width: 180, textAlign: 'right' }
 
 export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
@@ -290,12 +290,12 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
 
             {/* Row 3: GROSS, DATE, TIME */}
             <Text style={[S.lbl, { left: 36, top: 222 }]}>GROSS :</Text>
-            <Text style={[S.lbl, { left: 390, top: 222 }]}>DATE :</Text>
+            <Text style={[S.lbl, { left: 345, top: 222 }]}>DATE :</Text>
             <Text style={[S.lbl, { left: 610, top: 222 }]}>TIME :</Text>
 
             {/* Row 4: TARE, DATE, TIME */}
             <Text style={[S.lbl, { left: 36, top: 264 }]}>TARE  :</Text>
-            <Text style={[S.lbl, { left: 390, top: 264 }]}>DATE :</Text>
+            <Text style={[S.lbl, { left: 345, top: 264 }]}>DATE :</Text>
             <Text style={[S.lbl, { left: 610, top: 264 }]}>TIME :</Text>
 
             {/* Row 5: NET */}
@@ -303,7 +303,9 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
 
             {/* ---- Footer Section (Same Pink Background as Header) ---- */}
             {/* Gujarati conditions (exact text transcribed from scan) */}
-            <View style={[S.noteRow, { top: 355 }]}>
+            {/* Pinned to the bottom border (inner edge y=444) with ~6px
+                padding — keep in step with SatyanarayanPreview.jsx. */}
+            <View style={[S.noteRow, { bottom: 20 }]}>
               <Text style={S.gujText}>* વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</Text>
             </View>
             <View style={[S.noteRow, { top: 370 }]}>
@@ -324,7 +326,7 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
 
             {/* Service 24 Hours Box (same pink background as footer/header) */}
             <View style={S.serviceBox}>
-              <Text style={S.serviceTxt}>Sevice</Text>
+              <Text style={S.serviceTxt}>Service</Text>
               <Text style={S.serviceNum}>24</Text>
               <Text style={S.hoursTxt}>Hours</Text>
             </View>

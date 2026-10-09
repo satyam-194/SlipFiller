@@ -13,6 +13,9 @@ const CREAM = '#f9eb82'        // Soft light yellow tint for header & rules
 // printer lays down a light neutral grey, not black, and a laser printer
 // renders a pale tone darker than nominal. Raise toward #b0b0b0 to lighten.
 const VAL = '#a0a0a0'
+// Darker ribbon ink for the printed 'values' overlay only: on the real slip
+// the typed figures read much heavier than this faded preview grey.
+const VAL_PRINT = '#3c3c3c'
 
 const PAGE_W = 850
 const PAGE_H = 458
@@ -468,14 +471,24 @@ const WT = { left: 165, width: 128, textAlign: 'right' }
 const FIT_X = -124
 const FIT_Y = 0
 
+// Registration correction for the 'values' overlay ONLY — the one mode that
+// actually prints onto the pre-printed paper. Measured from a printed sample:
+// the values landed left of and above their fields, so shift right and down.
+// The 'full'/'blank' previews keep the unshifted coordinates.
+const VALUES_DX = 48
+const VALUES_DY = 26
+
+// The DATE and TIME columns alone were measured too far left: with the layer
+// registration correct everywhere else, these four values still printed hard
+// against their pre-printed "DATE :" / "TIME :" labels. This is a per-column
+// correction, not a registration fix — it must not absorb a whole-layer shift.
+const DT_DX = 26
+
 export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  // Same faded-ribbon grey in every mode. This used to force pure black in
-  // 'values' mode — the one mode that actually prints on the pre-printed
-  // paper — so printed values came out far darker than the real machine's.
-  const vColor = VAL
+  const vColor = isValues ? VAL_PRINT : VAL
 
   const receiverValue = data.party || data.receiver || ''
   const supplierValue = data.supplierName || ''
@@ -617,7 +630,7 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
 
         {/* Dynamic Values Layer (Dot-matrix overlay) */}
         {showValues && (
-          <View style={{ position: 'absolute', left: FIT_X + offsetX, top: FIT_Y + offsetY, width: PAGE_W, height: PAGE_H }}>
+          <View style={{ position: 'absolute', left: FIT_X + offsetX + (isValues ? VALUES_DX : 0), top: FIT_Y + offsetY + (isValues ? VALUES_DY : 0), width: PAGE_W, height: PAGE_H }}>
             {/* Row 1: SR. NO, CHARGES, VEHICLE No. */}
             {/* Held back from the measured column: with FIT_X applied, 98
                 would start at x=-26 and the leading digit prints off the
@@ -633,13 +646,13 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
 
             {/* Row 3: GROSS, DATE, TIME */}
             <Text style={[S.val, WT, { top: 202, color: vColor }]}>{data.gross || ' '}</Text>
-            <Text style={[S.val, { left: 410, top: 202, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
-            <Text style={[S.val, { left: 655, top: 202, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
+            <Text style={[S.val, { left: 410 + DT_DX, top: 202, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
+            <Text style={[S.val, { left: 655 + DT_DX, top: 202, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 4: TARE, DATE, TIME */}
             <Text style={[S.val, WT, { top: 246, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, { left: 410, top: 246, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-            <Text style={[S.val, { left: 655, top: 246, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+            <Text style={[S.val, { left: 410 + DT_DX, top: 246, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
+            <Text style={[S.val, { left: 655 + DT_DX, top: 246, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
             {/* Row 5: NET, MATERIAL */}
             <Text style={[S.val, WT, { top: 290, color: vColor }]}>{data.net || ' '}</Text>

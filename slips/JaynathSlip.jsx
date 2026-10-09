@@ -88,11 +88,12 @@ const BOLD_OFFSETS = {
   xstrong: [[0.45, 0], [0, 0.45], [0.45, 0.45], [0.22, 0.22]],
 }
 const VAL_BOLD = 'strong'
-// The printed overlay gets a single strike: on the real slip the ribbon lays
-// down a light, thin character, and overstriking it came out far heavier than
-// the machine's own output. The on-screen preview keeps VAL_BOLD so the faded
-// blue values stay readable on a monitor.
-const VAL_BOLD_PRINT = 'normal'
+// The printed overlay needs the overstrike as much as the preview does. A
+// single strike at a pale grey was tried to mimic the machine's thin ribbon,
+// but the dot-matrix glyphs are built from isolated dots: at that weight the
+// printer dropped dots and the characters came out as broken specks rather
+// than readable strokes. The extra passes close the gaps.
+const VAL_BOLD_PRINT = 'strong'
 
 // One typed value, struck `bold` times. `style` is the usual array of styles;
 // left/top come from it, and each extra pass re-reads them so the offset
@@ -148,12 +149,10 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  // The real machine's ribbon lays down a pale, thin strike — on the original
-  // slip the typed values read much lighter than the pre-printed blue labels.
-  // This pale grey reproduces that; darker greys printed heavier than the
-  // machine. Going much lighter risks thin strokes dropping out on the printer.
-  const vColor = isValues ? '#a8a8a8' : VAL
-  // Single strike on paper, faked bold on screen — see VAL_BOLD_PRINT.
+  // Mid grey: lighter than the pre-printed blue labels, as on the original
+  // slip, but dark enough that the dot-matrix glyphs hold together. Paler
+  // greys (#a8a8a8) printed as scattered specks with broken strokes.
+  const vColor = isValues ? '#6e6e6e' : VAL
   const vBold = isValues ? VAL_BOLD_PRINT : VAL_BOLD
 
   return (

@@ -3,6 +3,7 @@ import { Document, Text, View, StyleSheet, Svg, Rect, Circle, Image } from '@rea
 import '../fonts.js'
 import PrintPage from './printSpec.jsx'
 import murlidharLogo from '../murlidharLogo.js'
+import murlidharWordmark from '../murlidharWordmark.js'
 
 // Color palette accurately matched from murlidhar cropped.jpeg
 const BLUE = '#244594'         // Royal/Cobalt Blue press ink
@@ -170,14 +171,16 @@ const S = StyleSheet.create({
     fontWeight: 700,
     color: BLUE,
   },
+  // Masthead. The company name is the real wordmark artwork scanned off the
+  // stationery, not type: its serifs, the white keyline around each letter and
+  // the uneven ink are particular to the printed form and no font reproduces
+  // them. Width is set and height derived from the asset's own 10.256:1 ink
+  // aspect ratio — set both from that ratio or the letterforms stretch.
   companyTitle: {
-    fontSize: 41,
-    fontFamily: 'Times-Bold',
-    color: BLUE,
-    letterSpacing: 2,
-    textAlign: 'center',
-    lineHeight: 1,
-    marginTop: 1,
+    width: 446,
+    height: 446 / 10.256,
+    marginTop: 2,
+    marginBottom: 1,
   },
   goldBanner: {
     backgroundColor: GOLD,
@@ -486,8 +489,8 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
                 <Text style={S.blessingTxt}>॥ જયશ્રી કૃષ્ણ ॥</Text>
                 <Text style={S.blessingTxt}>॥ રામ ॥</Text>
               </View>
-              {/* MURLIDHAR in Royal Blue */}
-              <Text style={S.companyTitle}>MURLIDHAR</Text>
+              {/* MURLIDHAR masthead — wordmark artwork, not type */}
+              <Image src={murlidharWordmark} style={S.companyTitle} />
               {/* WEIGH-BRIDGE in Gold Banner */}
               <View style={S.goldBanner}>
                 <Text style={S.goldBannerTxt}>WEIGH-BRIDGE</Text>

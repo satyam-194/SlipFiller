@@ -7,7 +7,18 @@ import PrintPage from './printSpec.jsx'
 const INK = '#e13464'
 const PAPER = '#fce3f2'
 const BOX_BG = '#fdf0f9'
-const VAL = '#1a1a1a'
+
+// Typed-value ink. The weighbridge's dot-matrix ribbon is worn, so values come
+// out a light neutral grey, not black. Measured off a close-up of a real slip,
+// normalised against the paper in the same shot (that photo is underexposed —
+// its "white" reads 196, not 255 — so raw pixel values would mislead): the
+// strokes read about 63% of paper reflectance, i.e. ~#a9a9a9.
+//
+// Laser printers also render a light grey darker than its nominal value, since
+// halftoning a pale tone tends to over-ink. #a0a0a0 is therefore set at the
+// light end of the measured range rather than the middle. If prints still come
+// out too dark, raise this number (#b0b0b0, #bcbcbc); lower it to darken.
+const VAL = '#a0a0a0'
 
 // Design canvas: scan is 1054x568 px -> 850x458 pt (scale 0.8065).
 // All absolute coordinates below are in this canvas space.
@@ -45,13 +56,15 @@ const S = StyleSheet.create({
 
   // ---- fields box ----
   lbl: { position: 'absolute', fontSize: 13, fontFamily: 'Helvetica-Bold', color: INK },
-  // Typed values use the LX-310 draft face, like every other slip — these two
-  // were still on Helvetica. The dot face is monospaced at 10 CPI and so runs
-  // wider per character than Helvetica at the same size; 11.5/12 keeps the
-  // longest values inside their printed field.
-  val: { position: 'absolute', fontSize: 11.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.5 },
+  // Typed values use the LX-310 draft face. Size and letter spacing are set so
+  // the character pitch matches the weighbridge computer's print head as
+  // measured on a photographed real slip: 13.2pt per character cell in canvas
+  // units (fontSize 13 em-advance + 0.25 spacing). Every value carries an
+  // explicit width so react-pdf lays it out on one line — without one, a value
+  // near the right edge wraps or is clipped mid-character.
+  val: { position: 'absolute', fontSize: 13, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.25, width: 220 },
   wLbl: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica-Bold', color: INK },
-  wVal: { position: 'absolute', fontSize: 12, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.5 },
+  wVal: { position: 'absolute', fontSize: 13, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.25, width: 220 },
   icon: { position: 'absolute' },
 
   // ---- notes ----
@@ -117,12 +130,75 @@ const ROW = { gross: 112, tare: 155, net: 196 }
 // Column X positions inside the fields box
 const COL = { icon: 10, label: 62, value: 122, kg: 299, date: 341, dateVal: 392, time: 588, timeVal: 638, charges: 500, chargesVal: 610 }
 
+// Where the weighbridge computer actually drops its dot-matrix output,
+// measured off a photo of a real printed slip (homography to canvas space,
+// each value anchored to its nearest pre-printed label to cancel the photo's
+// perspective). Box-relative coordinates. The machine's text lines do NOT sit
+// on the pre-printed label rows: every line prints high — the serial/vehicle
+// line lands right across the fields-box top border, party/material land on
+// the SERIAL/VEHICLE row, the weights float ~17pt above their own labels —
+// and the photo is the authority on all of it.
+const V = {
+  line1: -2.2,  // serial + vehicle no (straddles the box top border, like the photo)
+  line2: 25.5,  // party + material (on the pre-printed SERIAL/VEHICLE row)
+  // Weigh rows. The pitch between them is the pre-printed form's own row
+  // pitch, measured off a test print: 43.4pt from gross to tare and 40.6pt
+  // from tare to net. Earlier these were 48.7 and 28.3, which is why the tare
+  // line drifted well below its label while net crowded up against it.
+  gross: 95,
+  tare: 138.4,
+  net: 179,
+  // Column positions, all in one coordinate system. These are deliberately
+  // NOT adjusted to stop values overlapping labels in the 'full' preview —
+  // only the printed 'values' overlay matters, and there the labels come from
+  // the pre-printed paper, not from us. Compensating a column to keep the
+  // preview tidy cancels out part of FIT_X and breaks the real registration,
+  // so every column here moves together with FIT_X and nothing else.
+  serialX: 139,
+  // Party is the longest left-hand value, so after FIT_X it is the one that
+  // reaches the paper edge first: at 113.2 it started 3pt from x=0, close
+  // enough that a slightly left-fed sheet would clip the first letter. Held
+  // back far enough to keep a usable margin.
+  partyX: 135,
+  dateX: 457.2,
+  timeX: 712.9,
+  chargesX: 697,
+  // Right-hand column (vehicle no / material / charges), centred rather than
+  // left-anchored: the real machine runs a long vehicle number off the edge of
+  // the form, which a PDF cannot do — the page ends and the text is clipped
+  // mid-character. Centring lets a 13-character number fit while a short one
+  // ("COAL") still lands where the machine puts it.
+  rightMid: 739,
+  rightWidth: 220,
+}
 
-// GROSS / TARE / NET print as one right-aligned column ending at 284,
-// 15pt before the pre-printed "KG." at 299. Right-aligning (rather than
-// leaving them left-aligned at 122) lines the figures' last digits up with each
-// other and keeps a long weight from running into the label.
-const WT = { left: 122, width: 162, textAlign: 'right' }
+// Registration of the whole values layer against the pre-printed paper,
+// calibrated from test prints laid on the real stationery.
+//
+// These two numbers are the ONLY place registration is corrected. The column
+// constants in V above stay at their measured positions: nudging an individual
+// column to stop it overlapping a label in the on-screen 'full' preview would
+// silently cancel part of this shift, and the preview's labels are not what
+// the values land on — the paper's are. A collision in the preview is
+// expected and harmless; only the 'values' overlay is printed.
+//
+// Derived from the weight column, which is the one column never adjusted
+// per-field and so reads honestly. On the latest test print the gross and net
+// figures each overlapped the pre-printed "KG." by about 40pt, and every value
+// sat ~21pt above its label — hence a further 52pt left (40 of overlap plus
+// ~12 of clearance before KG.) and 11pt down on top of the previous -72 / 9.
+const FIT_X = -124
+const FIT_Y = 20
+
+// Right column values: centred on V.rightMid so long entries grow both ways
+// and stay on the form instead of running past the page edge.
+const RIGHT = { left: V.rightMid - V.rightWidth / 2, width: V.rightWidth, textAlign: 'center' }
+
+// GROSS / TARE / NET print as one right-aligned column; on the real slip the
+// 4-digit gross ends 38pt right of the "KG." label's left edge (the weight
+// floats a line above the label, so overlapping its x-range is correct).
+// Right-aligning lines the figures' last digits up with each other.
+const WT = { left: 179.6, width: 162, textAlign: 'right' }
 
 // Static half of a weigh row: icon + GROSS/TARE/NET, KG., DATE :, TIME : labels
 function WeighRowLabels({ y, icon, label, kg, date, time }) {
@@ -137,13 +213,14 @@ function WeighRowLabels({ y, icon, label, kg, date, time }) {
   )
 }
 
-// Dynamic half of a weigh row: weight, date and time values
+// Dynamic half of a weigh row: weight, date and time values. y is the
+// machine print line (V.gross / V.tare / V.net), not the label row.
 function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
   return (
     <>
-      <Text style={[S.wVal, WT, { top: y - 6, color }]}>{value || ' '}</Text>
-      {date && <Text style={[S.wVal, { left: COL.dateVal, top: y - 6, color }]}>{dateVal || ' '}</Text>}
-      {time && <Text style={[S.wVal, { left: COL.timeVal, top: y - 6, color }]}>{timeVal || ' '}</Text>}
+      <Text style={[S.wVal, WT, { top: y, color }]}>{value || ' '}</Text>
+      {date && <Text style={[S.wVal, { left: V.dateX, top: y, color }]}>{dateVal || ' '}</Text>}
+      {time && <Text style={[S.wVal, { left: V.timeX, top: y, color }]}>{timeVal || ' '}</Text>}
     </>
   )
 }
@@ -174,7 +251,10 @@ export default function AmbikaSlip({ data, mode = 'full', offsetX = 0, offsetY =
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  const vColor = isValues ? '#000000' : VAL
+  // Same faded-ribbon grey in every mode. The overlay used to force pure black
+  // here, which is the one mode that actually goes on the pre-printed paper —
+  // so the printed values came out far darker than the real machine's.
+  const vColor = VAL
 
   return (
     <Document>
@@ -239,15 +319,15 @@ export default function AmbikaSlip({ data, mode = 'full', offsetX = 0, offsetY =
           )}
 
           {showValues && (
-            <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: BOX.width, height: BOX.height }}>
-              <Text style={[S.val, { left: 98, top: 20, color: vColor }]}>{data.serialNo || ' '}</Text>
-              <Text style={[S.val, { left: 622, top: 20, color: vColor }]}>{data.vehicleNo || ' '}</Text>
-              <Text style={[S.val, { left: 74, top: 44, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.val, { left: 634, top: 44, color: vColor }]}>{data.material || ' '}</Text>
-              <WeighRowValues y={ROW.gross} value={data.gross} date dateVal={fmtDate(data.grossDate)} time timeVal={fmtTime(data.grossTime)} color={vColor} />
-              <WeighRowValues y={ROW.tare} value={data.tare} date dateVal={fmtDate(data.tareDate)} time timeVal={fmtTime(data.tareTime)} color={vColor} />
-              <WeighRowValues y={ROW.net} value={data.net} color={vColor} />
-              <Text style={[S.wVal, { left: COL.chargesVal, top: ROW.net - 6, color: vColor }]}>{data.charges || ' '}</Text>
+            <View style={{ position: 'absolute', left: FIT_X + offsetX, top: FIT_Y + offsetY, width: PAGE_W, height: BOX.height }}>
+              <Text style={[S.val, { left: V.serialX, top: V.line1, color: vColor }]}>{data.serialNo || ' '}</Text>
+              <Text style={[S.val, RIGHT, { top: V.line1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+              <Text style={[S.val, { left: V.partyX, top: V.line2, width: 500, color: vColor }]}>{data.party || ' '}</Text>
+              <Text style={[S.val, RIGHT, { top: V.line2, color: vColor }]}>{data.material || ' '}</Text>
+              <WeighRowValues y={V.gross} value={data.gross} date dateVal={fmtDate(data.grossDate)} time timeVal={fmtTime(data.grossTime)} color={vColor} />
+              <WeighRowValues y={V.tare} value={data.tare} date dateVal={fmtDate(data.tareDate)} time timeVal={fmtTime(data.tareTime)} color={vColor} />
+              <WeighRowValues y={V.net} value={data.net} color={vColor} />
+              <Text style={[S.wVal, RIGHT, { top: V.net, color: vColor }]}>{data.charges || ' '}</Text>
             </View>
           )}
         </View>

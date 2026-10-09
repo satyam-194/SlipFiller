@@ -449,7 +449,7 @@ const fmtTime = (t) => {
 // with each other regardless of digit count.
 const WT = { left: 165, width: 128, textAlign: 'right' }
 
-export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -460,7 +460,7 @@ export default function MurlidharSlip({ data, mode = 'full', offsetX = 0, offset
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg="#ffffff" debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg="#ffffff" debug={debug} pageMode={pageMode}>
         {showStatic && (
           <>
             {/* Single Outer Blue Border with light yellow paper background INSIDE the border only */}

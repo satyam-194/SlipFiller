@@ -1,5 +1,6 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react'
 import { pdf } from '@react-pdf/renderer'
+import { slipDocxBlob } from './docxExport.js'
 import AmbikaSlip from './slips/AmbikaSlip.jsx'
 import JaynathSlip from './slips/JaynathSlip.jsx'
 import KrishnaSlip from './slips/KrishnaSlip.jsx'
@@ -13,7 +14,6 @@ import SatyanarayanSlip from './slips/SatyanarayanSlip.jsx'
 import ShivSlip from './slips/ShivSlip.jsx'
 import MurlidharSlip from './slips/MurlidharSlip.jsx'
 import JaySatyanarayanSlip from './slips/JaySatyanarayanSlip.jsx'
-import { mmToPt } from './slips/printSpec.jsx'
 import SlipPreview from './SlipPreview.jsx'
 import JaynathPreview from './JaynathPreview.jsx'
 import KrishnaPreview from './KrishnaPreview.jsx'
@@ -186,14 +186,22 @@ const TEMPLATES = [
   },
 ]
 
-const OFFSETS_KEY = 'slipfiller-offsets'
+const PAGE_MODE_KEY = 'slipfiller-pagemode'
 
-function loadOffsets() {
-  try {
-    return JSON.parse(localStorage.getItem(OFFSETS_KEY)) || {}
-  } catch {
-    return {}
-  }
+// PDF page setup sent to the printer. Default 'a4': portrait A4 page
+// (identical MediaBox to the reference PDF confirmed to print perfectly on
+// the LX-310) with the slip at actual size in the top-left — portrait pages
+// are never auto-rotated by the driver. The landscape modes keep the true
+// 8x4in MediaBox for drivers configured with the real form size.
+const PAGE_MODES = [
+  { id: 'a4', label: 'A4 portrait — same as working PDF (recommended)' },
+  { id: 'landscape', label: '8×4in landscape' },
+  { id: 'landscape-flip', label: '8×4in landscape, rotated 180°' },
+]
+
+function loadPageMode() {
+  const stored = localStorage.getItem(PAGE_MODE_KEY)
+  return PAGE_MODES.some((m) => m.id === stored) ? stored : 'a4'
 }
 
 // Searchable template dropdown. Scales past the handful of slips that fit as
@@ -343,8 +351,13 @@ function TemplateSelect({ templates, value, onSelect }) {
 export default function App() {
   const [data, setData] = useState(initialData)
   const [templateId, setTemplateId] = useState('jaysatyanarayan')
-  const [offsets, setOffsets] = useState(loadOffsets)
+  const [pageMode, setPageMode] = useState(loadPageMode)
   const [debug, setDebug] = useState(false)
+
+  const changePageMode = (v) => {
+    setPageMode(v)
+    localStorage.setItem(PAGE_MODE_KEY, v)
+  }
   const [busy, setBusy] = useState(false)
 
   const template = TEMPLATES.find((t) => t.id === templateId)
@@ -352,14 +365,6 @@ export default function App() {
   const isJaynath = templateId === 'jaynath'
   const isKrishna = templateId === 'krishna'
   const isMurlidhar = templateId === 'murlidhar'
-
-  const off = offsets[templateId] || { x: 0, y: 0 }
-  const setOff = (axis, raw) => {
-    const v = parseFloat(raw) || 0
-    const next = { ...offsets, [templateId]: { ...off, [axis]: v } }
-    setOffsets(next)
-    localStorage.setItem(OFFSETS_KEY, JSON.stringify(next))
-  }
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -372,15 +377,13 @@ export default function App() {
     })
   }
 
-  // Build the slip document for a given layer/mode. The feed offset only
-  // applies to what the dot matrix prints (values); blank/full get none.
-  const makeDoc = (mode, d = data) => (
+  // Build the slip document for a given layer/mode.
+  const makeDoc = (mode, d = data, pm = pageMode) => (
     <Slip
       data={d}
       mode={mode}
-      offsetX={mode === 'values' ? mmToPt(off.x) : 0}
-      offsetY={mode === 'values' ? mmToPt(off.y) : 0}
       debug={debug}
+      pageMode={pm}
     />
   )
 
@@ -400,6 +403,22 @@ export default function App() {
       const a = document.createElement('a')
       a.href = url
       a.download = `${template.id}_${mode}.pdf`
+      a.click()
+      URL.revokeObjectURL(url)
+    })
+
+  // Word export: the slip rendered as an actual-size image on a Letter
+  // portrait page — the same page setup as the Word docs that already print
+  // correctly on this printer. The slip itself is rendered with
+  // pageMode='landscape' (true 8x4in MediaBox) so the rasterised page IS the
+  // slip, then docxExport places it at the page's top-left corner.
+  const downloadDocx = (mode, d = data) =>
+    withBusy(async () => {
+      const blob = await slipDocxBlob(makeDoc(mode, d, 'landscape'))
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `${template.id}_${mode}.docx`
       a.click()
       URL.revokeObjectURL(url)
     })
@@ -458,6 +477,14 @@ export default function App() {
                 className={`${btnClass} w-full bg-slate-700 text-white`}>
                 🧪 Print Test Values (calibration)
               </button>
+              <button onClick={() => downloadDocx('values')} disabled={busy}
+                className={`${btnClass} w-full bg-blue-600 text-white`}>
+                📄 Values DOCX (Word)
+              </button>
+              <button onClick={() => downloadDocx('full')} disabled={busy}
+                className={`${btnClass} w-full bg-slate-100 text-slate-700 border border-slate-300`}>
+                📄 Full Slip DOCX
+              </button>
               <button onClick={() => download('values')} disabled={busy}
                 className={`${btnClass} w-full bg-slate-100 text-slate-700 border border-slate-300`}>
                 ⬇️ Values PDF
@@ -471,20 +498,15 @@ export default function App() {
                 ⬇️ Full Slip PDF
               </button>
 
-              {/* Feed alignment */}
+              {/* Print setup */}
               <div className="pt-2 border-t border-slate-100">
-                <div className="text-xs font-bold text-gray-500 uppercase tracking-wide mb-2">Feed Alignment (mm)</div>
-                <div className="flex gap-2">
-                  <div className="flex-1">
-                    <label className={labelClass}>X (→ right)</label>
-                    <input type="number" step="0.5" value={off.x} onChange={(e) => setOff('x', e.target.value)} className={inputClass} />
-                  </div>
-                  <div className="flex-1">
-                    <label className={labelClass}>Y (↓ down)</label>
-                    <input type="number" step="0.5" value={off.y} onChange={(e) => setOff('y', e.target.value)} className={inputClass} />
-                  </div>
+                <div className="mt-2">
+                  <label className={labelClass}>PDF Page Setup</label>
+                  <select value={pageMode} onChange={(e) => changePageMode(e.target.value)} className={inputClass}>
+                    {PAGE_MODES.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}
+                  </select>
+                  <p className="text-[11px] text-gray-400 mt-1">A4 portrait has the exact page specs of your known-good PDF — no driver rotation.</p>
                 </div>
-                <p className="text-[11px] text-gray-400 mt-1">Shifts only the printed values. Saved per template.</p>
                 <label className="flex items-center gap-2 mt-2 text-xs font-semibold text-gray-600">
                   <input type="checkbox" checked={debug} onChange={(e) => setDebug(e.target.checked)} />
                   Debug guides (paper edge + safe area)
@@ -549,6 +571,8 @@ export default function App() {
               🖨️ Print Values (Dot Matrix)
             </button>
             <button onClick={() => printDoc('values', TEST_DATA)} disabled={busy} className={`${btnClass} w-full bg-slate-700 text-white`}>🧪 Print Test Values</button>
+            <button onClick={() => downloadDocx('values')} disabled={busy} className={`${btnClass} w-full bg-blue-600 text-white`}>📄 Values DOCX (Word)</button>
+            <button onClick={() => downloadDocx('full')} disabled={busy} className={`${btnClass} w-full bg-slate-100 text-slate-700 border border-slate-300`}>📄 Full Slip DOCX</button>
             <button onClick={() => download('values')} disabled={busy} className={`${btnClass} w-full bg-slate-100 text-slate-700 border border-slate-300`}>⬇️ Values PDF</button>
             <button onClick={() => download('blank')} disabled={busy} className={`${btnClass} w-full bg-slate-100 text-slate-700 border border-slate-300`}>⬇️ Blank Stationery PDF</button>
             <button onClick={() => download('full')} disabled={busy} className={`${btnClass} w-full bg-slate-100 text-slate-700 border border-slate-300`}>⬇️ Full Slip PDF</button>

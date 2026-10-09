@@ -170,7 +170,7 @@ const NOTE_LINES = [
 //       'values' (dot-matrix overlay: white page, values only, black ink)
 // offsetX/offsetY (pt): nudge applied to the values layer only, to compensate
 //       for how the pre-printed continuous paper is loaded in the tractor feed
-export default function AmbikaSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function AmbikaSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -178,7 +178,7 @@ export default function AmbikaSlip({ data, mode = 'full', offsetX = 0, offsetY =
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug} pageMode={pageMode}>
 
         {showStatic && (
           <>

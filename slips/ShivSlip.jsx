@@ -323,7 +323,7 @@ const fmtTime = (t) => {
 // left edge) also lines up the figures' last digits regardless of digit count.
 const WT = { left: 170, width: 160, textAlign: 'right' }
 
-export default function ShivSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function ShivSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -333,7 +333,7 @@ export default function ShivSlip({ data, mode = 'full', offsetX = 0, offsetY = 0
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg="#ffffff" debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg="#ffffff" debug={debug} pageMode={pageMode}>
         {showStatic && (
           <>
             {/* Outer red border (with PAPER background inside only) */}

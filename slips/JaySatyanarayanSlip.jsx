@@ -243,7 +243,7 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
-export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -253,7 +253,7 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug} pageMode={pageMode}>
         {showStatic && (
           <>
             {/* Main red border without radius + pink background */}

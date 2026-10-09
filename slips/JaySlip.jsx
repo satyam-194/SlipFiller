@@ -112,7 +112,7 @@ const NOTE_LINES = [
 
 // mode: 'full' (design + values), 'blank' (pre-print stationery master),
 //       'values' (dot-matrix overlay: white page, values only, black ink)
-export default function JaySlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function JaySlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -120,7 +120,7 @@ export default function JaySlip({ data, mode = 'full', offsetX = 0, offsetY = 0,
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug} pageMode={pageMode}>
 
         {showStatic && (
           <>

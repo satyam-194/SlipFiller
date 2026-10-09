@@ -9,7 +9,7 @@
    absolutely positioned values. */
 @font-face {
   font-family: 'DotMatrix';
-  src: url('/fonts/LX310Dot.ttf?v=4') format('truetype');
+  src: url('/fonts/LX310Dot.ttf?v=5') format('truetype');
   font-display: block;
 }
 

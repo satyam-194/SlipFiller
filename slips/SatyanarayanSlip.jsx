@@ -238,7 +238,7 @@ const fmtTime = (t) => {
 // left edge) also lines up the figures' last digits regardless of digit count.
 const WT = { left: 150, width: 225, textAlign: 'right' }
 
-export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -248,7 +248,7 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug} pageMode={pageMode}>
         {showStatic && (
           <>
             {/* Main red border without radius + pink background */}

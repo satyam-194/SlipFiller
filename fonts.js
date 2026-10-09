@@ -23,7 +23,7 @@ Font.register({
 // scan of each pre-printed form; see DOT_* in fonts.js consumers.
 Font.register({
   family: 'DotMatrix',
-  src: '/fonts/LX310Dot.ttf?v=4',
+  src: '/fonts/LX310Dot.ttf?v=5',
 })
 
 // No hyphenation for typed values: the printer never breaks a word, it just

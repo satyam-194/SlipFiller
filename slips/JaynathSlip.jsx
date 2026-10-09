@@ -39,11 +39,17 @@ const S = StyleSheet.create({
   rule: { position: 'absolute', left: 8, width: PAGE_W - 16, height: 1.5, backgroundColor: INK },
 
   lbl: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica-Bold', color: INK },
-  val: { position: 'absolute', fontSize: 14, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
-  // Condensed pitch (the printer's 17 CPI mode) for the Gross/Tare Date runs:
-  // a 10-char date from x=575 is 149pt at the normal size and would end at
-  // 724, running under the time that starts at 700. At 11/0.4 it ends at 689.
-  valNarrow: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
+  // One size for every typed field, matching JaynathPreview's VAL_SIZE — see
+  // the note there for how it was derived from the scan. letterSpacing is 0
+  // because DotMatrix is monospaced at one em per character cell, so the
+  // advance is already the printer's pitch.
+  val: { position: 'absolute', fontSize: 8.5, fontFamily: 'DotMatrix', color: VAL },
+  // The dates are NOT condensed on the original — they measured the same cap
+  // height as every other value. The 17 CPI mode this used to emulate was only
+  // needed because the values were set at 14pt, where a 10-char date from
+  // x=575 ran 149pt wide and collided with the time at x=700. At 8.5pt the
+  // same date is 85pt and ends at 660, so the collision is gone.
+  valNarrow: { position: 'absolute', fontSize: 8.5, fontFamily: 'DotMatrix', color: VAL },
 
   guj: { position: 'absolute', fontSize: 10.5, fontFamily: 'NotoGujarati', fontWeight: 400, color: INK },
   lat: { position: 'absolute', fontSize: 11.5, fontFamily: 'Helvetica', color: INK },
@@ -65,16 +71,50 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
+// Fake bold — the PDF half of the effect described in JaynathPreview.jsx.
+// react-pdf has no text-shadow, so the extra strikes are real <Text> layers
+// drawn at the same position plus a sub-point offset. Offsets are identical to
+// the preview's so screen and paper land in the same place.
+const BOLD_OFFSETS = {
+  normal: [],
+  strong: [[0.35, 0], [0, 0.35]],
+  xstrong: [[0.45, 0], [0, 0.45], [0.45, 0.45], [0.22, 0.22]],
+}
+const VAL_BOLD = 'strong'
+
+// One typed value, struck VAL_BOLD times. `style` is the usual array of styles;
+// left/top come from it, and each extra pass re-reads them so the offset
+// applies on top of whatever the caller positioned. Right-aligned fields (the
+// WT column) carry width + textAlign in the same style array, so the overstrike
+// stays aligned with the base pass without any special handling here.
+function Val({ style, children }) {
+  const flat = Object.assign({}, ...[].concat(style).filter(Boolean))
+  const offs = BOLD_OFFSETS[VAL_BOLD] || []
+  return (
+    <>
+      <Text style={flat}>{children}</Text>
+      {offs.map(([dx, dy], i) => (
+        <Text
+          key={i}
+          style={{ ...flat, left: (flat.left || 0) + dx, top: (flat.top || 0) + dy }}
+        >
+          {children}
+        </Text>
+      ))}
+    </>
+  )
+}
+
 // GROSS / TARE / NET print as one right-aligned column ending at 425, 15pt
-// before the "Gross Date" / "Tare Date" / "Charges" label column at 440. These
-// figures print at 17pt (larger than the base val), so the column is 210pt wide
-// — room for a 6-digit weight. Right-aligning (rather than leaving them
-// left-aligned at 215) lines their last digits up whatever the digit count.
+// before the "Gross Date" / "Tare Date" / "Charges" label column at 440. They
+// print at the same size as every other value — the original shows no size
+// change here. Right-aligning (rather than leaving them left-aligned at 215)
+// lines their last digits up whatever the digit count.
 const WT = { left: 215, width: 210, textAlign: 'right' }
 
 // mode: 'full' | 'blank' (stationery master) | 'values' (dot-matrix overlay)
 // offsetX/offsetY (pt): tractor-feed alignment nudge, values layer only
-export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false }) {
+export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
@@ -82,7 +122,7 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
 
   return (
     <Document>
-      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug}>
+      <PrintPage designW={PAGE_W} designH={PAGE_H} bg={isValues ? '#ffffff' : PAPER} debug={debug} pageMode={pageMode}>
 
         {showStatic && (
           <>
@@ -160,19 +200,19 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
 
         {showValues && (
           <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
-            <Text style={[S.val, { left: 215, top: 134, color: vColor }]}>{data.serialNo || ' '}</Text>
-            <Text style={[S.val, { left: 230, top: 162, color: vColor }]}>{data.party || ' '}</Text>
-            <Text style={[S.val, { left: 215, top: 206, color: vColor }]}>{data.vehicleNo || ' '}</Text>
-            <Text style={[S.val, WT, { top: 249, fontSize: 17, color: vColor }]}>{data.gross || ' '}</Text>
-            <Text style={[S.val, WT, { top: 292, fontSize: 17, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, WT, { top: 335, fontSize: 17, color: vColor }]}>{data.net || ' '}</Text>
-            <Text style={[S.val, { left: 585, top: 150, color: vColor }]}>{data.supplierName || ' '}</Text>
-            <Text style={[S.val, { left: 585, top: 194, color: vColor }]}>{data.material || ' '}</Text>
-            <Text style={[S.valNarrow, { left: 575, top: 240, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Text>
-            <Text style={[S.valNarrow, { left: 700, top: 240, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
-            <Text style={[S.valNarrow, { left: 575, top: 282, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Text>
-            <Text style={[S.valNarrow, { left: 700, top: 282, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
-            <Text style={[S.val, { left: 700, top: 315, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Text>
+            <Val style={[S.val, { left: 215, top: 142, color: vColor }]}>{data.serialNo || ' '}</Val>
+            <Val style={[S.val, { left: 230, top: 170, color: vColor }]}>{data.party || ' '}</Val>
+            <Val style={[S.val, { left: 215, top: 214, color: vColor }]}>{data.vehicleNo || ' '}</Val>
+            <Val style={[S.val, WT, { top: 257, color: vColor }]}>{data.gross || ' '}</Val>
+            <Val style={[S.val, WT, { top: 300, color: vColor }]}>{data.tare || ' '}</Val>
+            <Val style={[S.val, WT, { top: 343, color: vColor }]}>{data.net || ' '}</Val>
+            <Val style={[S.val, { left: 585, top: 158, color: vColor }]}>{data.supplierName || ' '}</Val>
+            <Val style={[S.val, { left: 585, top: 202, color: vColor }]}>{data.material || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 575, top: 246, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 700, top: 246, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 575, top: 288, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 700, top: 288, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
+            <Val style={[S.val, { left: 700, top: 330, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Val>
           </View>
         )}
 

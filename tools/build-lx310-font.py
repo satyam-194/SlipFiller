@@ -12,17 +12,20 @@ about half their diameter and strokes read as slightly lumpy continuous lines.
 Reproducing that needs control over dot radius vs. pitch, which only a
 generated outline gives us.
 
-Each lit pin becomes a circle, approximated by four cubic Bezier arcs. Dots
-are emitted as separate overlapping contours, all wound the same direction,
-and the PDF/TrueType non-zero winding fill merges them into one black shape —
-no boolean union needed, and overlaps stay solid rather than knocking out.
+Each lit pin becomes a circle, approximated by quadratic arcs. Dots are emitted
+as separate overlapping contours, all wound the same direction, and the
+PDF/TrueType non-zero winding fill merges them into one black shape — no
+boolean union needed, and overlaps stay solid rather than knocking out.
 
 Metrics (units per em = 1000, matching the PDF text space the slips use):
-  - Column pitch (1/120in) and row pitch (1/72in) are expressed as a fraction
-    of the 1/10in character cell, so the em maps to exactly one 10 CPI cell:
-    advance = 1000 units = 1/10in. Setting fontSize = N pt therefore prints at
-    N/7.2 characters per inch; fontSize 7.2 is true 10 CPI.
-  - Cap height spans pins 1-7 (6 row steps); the baseline sits on pin 7.
+  - The em is one character cell, so advance = 1000 units and the font is
+    strictly monospaced. Column and row pitch are set from measurements taken
+    off the Jaynath slip scan rather than from the manual's nominal 1/120 in
+    and 1/72 in; see COL_PITCH and ROW_PITCH below for the numbers and why.
+  - Cap height spans pins 1-7 (6 row steps); the baseline sits on pin 7. With
+    the measured row pitch that makes the cap slightly taller than the em,
+    which is correct: on the slip a capital is about as tall as the cell is
+    wide. Consumers set line height explicitly, so the overhang is harmless.
 """
 
 import importlib.util
@@ -40,27 +43,32 @@ ROOT = os.path.dirname(HERE)
 # ---------------------------------------------------------------- geometry
 UPEM = 1000
 
-# One character cell = 1/10 inch = 12 horizontal steps of 1/120 in.
-H_STEPS_PER_CELL = 12
-COL_PITCH = UPEM / H_STEPS_PER_CELL          # 83.33 units = 1/120 in
+# One character cell is one em. The slip's ink box measured 18 px against a
+# 20.5 px advance, so the glyph's 10 ink columns have to span ~0.88 em rather
+# than the 9-of-12 (0.75 em) the idealised draft grid would give. Dividing the
+# em into ADVANCE_COLS steps and inking INK_COLS of them reproduces that.
+H_STEPS_PER_CELL = 11
+COL_PITCH = UPEM / H_STEPS_PER_CELL          # 90.91 units
 
-# Vertical pin pitch is 1/72 in. In units of the 1/10in-wide em that is
-# (1/72) / (1/10) = 10/72 of the em.
-ROW_PITCH = UPEM * (10.0 / 72.0)             # 138.89 units = 1/72 in
+# Row pitch, measured off the scan: rows sat 3.5-4.3 px apart against a 2.05 px
+# column pitch. 1.85x the column pitch is the midpoint of that range, and it is
+# what makes the glyphs read as wide-and-flat like the original instead of the
+# tall, narrow shapes the textbook 1/72-in pin spacing produced.
+ROW_PITCH = COL_PITCH * 1.85                 # 168.2 units
 
-# Printed dot diameter is ~1/60 in, i.e. radius == one column step (1.0x).
-# Nominal 1.0x is the geometric ideal, but the pin strikes through a ribbon
-# onto paper, so what actually lands is a slightly smaller hard core with a
-# soft edge. 0.85x reproduces that: dots still overlap enough that a stroke
-# never breaks into separate beads, yet the scalloped edge stays visible, which
-# is the single most recognisable feature of 9-pin draft output.
+# Stroke weight: strokes are authored one dot wide, so a horizontal bar is a
+# run of single dots at COL_PITCH spacing and relies on the radius to close up
+# into the solid, continuous bar the scan shows. The radius has to exceed half
+# the column pitch for that, with headroom so the join stays solid rather than
+# pinched.
 #
-# Checked by rasterising GROSS 12345 at 0.72 / 0.85 / 1.08:
-#   0.72x - dots separate, strokes fall apart (this is the failure mode of the
-#           Doto face this font replaces)
-#   1.08x - dots merge into solid bars; the dot character is lost, and at the
-#           ~15pt the slips use it would blob on a 600dpi laser
-#   0.85x - connected but visibly scalloped at both 15pt and 20pt
+# Checked by rasterising the slip's own value (GJ03BV 5655) against the scan:
+#   0.62x - bars break into visibly separate beads; too light, and the solid
+#           top bar of 5 / B / 3 that identifies this printer is lost
+#   0.95x - dots merge so far that rows start fusing vertically and the
+#           counters of 0 / 6 / B begin to fill in
+#   0.85x - bars solid along their length, rows still distinct, stroke ends
+#           scalloped — closest match to the scan at both 14pt and 17pt
 DOT_RADIUS = COL_PITCH * 0.85
 
 # Baseline is pin 7 (row index 6). Rows above it are positive y.
@@ -232,9 +240,10 @@ def main():
 
     print('wrote %s (%d bytes)' % (out, os.path.getsize(out)))
     print('  glyphs      : %d' % len(GLYPHS))
-    print('  upem        : %d  (= 1/10 in, one 10 CPI cell)' % UPEM)
-    print('  col pitch   : %.2f units (1/120 in)' % COL_PITCH)
-    print('  row pitch   : %.2f units (1/72 in)' % ROW_PITCH)
+    print('  upem        : %d  (one character cell)' % UPEM)
+    print('  col pitch   : %.2f units (em / %d)' % (COL_PITCH, H_STEPS_PER_CELL))
+    print('  row pitch   : %.2f units (%.2fx col pitch)'
+          % (ROW_PITCH, ROW_PITCH / COL_PITCH))
     print('  dot radius  : %.2f units (%.2fx col pitch)'
           % (DOT_RADIUS, DOT_RADIUS / COL_PITCH))
     print('  cap height  : %d' % cap_height)

@@ -58,7 +58,8 @@ const S = StyleSheet.create({
   // ---- fields ----
   lbl: { position: 'absolute', fontSize: 16, fontFamily: 'Times-Bold', color: INK },
   netLbl: { position: 'absolute', fontSize: 19, fontFamily: 'Times-Bold', color: INK },
-  val: { position: 'absolute', fontSize: 15, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Same size and letter spacing as JaynathSlip's typed values.
+  val: { position: 'absolute', fontSize: 13.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
 
   // pale press-printed "JAY" behind the fields
   watermark: {
@@ -110,13 +111,45 @@ const NOTE_LINES = [
   'ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતો નથી.',
 ]
 
+// Fake bold, as in JaynathSlip. react-pdf has no text-shadow, so the extra
+// strikes are real <Text> layers drawn at the same position plus a sub-point
+// offset. The dot-matrix glyphs are built from isolated dots; the extra passes
+// keep the strokes from breaking up when printed.
+const BOLD_OFFSETS = [[0.35, 0], [0, 0.35]]
+
+function Val({ style, children }) {
+  const flat = Object.assign({}, ...[].concat(style).filter(Boolean))
+  return (
+    <>
+      <Text style={flat}>{children}</Text>
+      {BOLD_OFFSETS.map(([dx, dy], i) => (
+        <Text
+          key={i}
+          style={{ ...flat, left: (flat.left || 0) + dx, top: (flat.top || 0) + dy }}
+        >
+          {children}
+        </Text>
+      ))}
+    </>
+  )
+}
+
+// Registration correction for the 'values' overlay ONLY — the mode that prints
+// onto the pre-printed paper. Measured from a printed sample: the typed values
+// landed right of their pre-printed colons, so the whole layer shifts left.
+// The 'full'/'blank' previews keep the unshifted coordinates.
+const VALUES_DX = -40
+
 // mode: 'full' (design + values), 'blank' (pre-print stationery master),
-//       'values' (dot-matrix overlay: white page, values only, black ink)
+//       'values' (dot-matrix overlay: white page, values only)
 export default function JaySlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  const vColor = isValues ? '#000000' : VAL
+  // Mid grey, matching JaynathSlip: lighter than the pre-printed labels, but
+  // dark enough that the dot-matrix glyphs hold together. Pure black (used
+  // here before) printed far heavier than the real machine's ribbon.
+  const vColor = isValues ? '#6e6e6e' : VAL
 
   return (
     <Document>
@@ -187,21 +220,21 @@ export default function JaySlip({ data, mode = 'full', offsetX = 0, offsetY = 0,
 
         {/* ---- Values (dot-matrix layer) ---- */}
         {showValues && (
-          <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
-            <Text style={[S.val, { left: L.value, top: ROWS.serial, color: vColor }]}>{data.serialNo || ' '}</Text>
-            <Text style={[S.val, { left: L.value, top: ROWS.vehicle, color: vColor }]}>{data.vehicleNo || ' '}</Text>
-            <Text style={[S.val, { left: L.value, top: ROWS.product, color: vColor }]}>{data.material || ' '}</Text>
-            <Text style={[S.val, { left: L.value, top: ROWS.supplier, color: vColor }]}>{data.party || ' '}</Text>
+          <View style={{ position: 'absolute', left: offsetX + (isValues ? VALUES_DX : 0), top: offsetY, width: PAGE_W, height: PAGE_H }}>
+            <Val style={[S.val, { left: L.value, top: ROWS.serial, color: vColor }]}>{data.serialNo || ' '}</Val>
+            <Val style={[S.val, { left: L.value, top: ROWS.vehicle, color: vColor }]}>{data.vehicleNo || ' '}</Val>
+            <Val style={[S.val, { left: L.value, top: ROWS.product, color: vColor }]}>{data.material || ' '}</Val>
+            <Val style={[S.val, { left: L.value, top: ROWS.supplier, color: vColor }]}>{data.party || ' '}</Val>
 
-            <Text style={[S.val, { left: L.value, top: ROWS.date1, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
-            <Text style={[S.val, { left: TIME.value, top: ROWS.date1, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
-            <Text style={[S.val, { left: L.value, top: ROWS.date2, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-            <Text style={[S.val, { left: TIME.value, top: ROWS.date2, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+            <Val style={[S.val, { left: L.value, top: ROWS.date1, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Val>
+            <Val style={[S.val, { left: TIME.value, top: ROWS.date1, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
+            <Val style={[S.val, { left: L.value, top: ROWS.date2, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Val>
+            <Val style={[S.val, { left: TIME.value, top: ROWS.date2, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
 
-            <Text style={[S.val, { left: R.chargeVal, top: R.chargeY, color: vColor }]}>{data.charges || ' '}</Text>
-            <Text style={[S.val, { left: R.wtVal, top: R.grossY, color: vColor }]}>{data.gross || ' '}</Text>
-            <Text style={[S.val, { left: R.wtVal, top: R.tareY, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, { left: R.wtVal, top: R.netY, color: vColor }]}>{data.net || ' '}</Text>
+            <Val style={[S.val, { left: R.chargeVal, top: R.chargeY, color: vColor }]}>{data.charges || ' '}</Val>
+            <Val style={[S.val, { left: R.wtVal, top: R.grossY, color: vColor }]}>{data.gross || ' '}</Val>
+            <Val style={[S.val, { left: R.wtVal, top: R.tareY, color: vColor }]}>{data.tare || ' '}</Val>
+            <Val style={[S.val, { left: R.wtVal, top: R.netY, color: vColor }]}>{data.net || ' '}</Val>
           </View>
         )}
 

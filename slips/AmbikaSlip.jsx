@@ -8,17 +8,13 @@ const INK = '#e13464'
 const PAPER = '#fce3f2'
 const BOX_BG = '#fdf0f9'
 
-// Typed-value ink. The weighbridge's dot-matrix ribbon is worn, so values come
-// out a light neutral grey, not black. Measured off a close-up of a real slip,
-// normalised against the paper in the same shot (that photo is underexposed —
-// its "white" reads 196, not 255 — so raw pixel values would mislead): the
-// strokes read about 63% of paper reflectance, i.e. ~#a9a9a9.
-//
-// Laser printers also render a light grey darker than its nominal value, since
-// halftoning a pale tone tends to over-ink. #a0a0a0 is therefore set at the
-// light end of the measured range rather than the middle. If prints still come
-// out too dark, raise this number (#b0b0b0, #bcbcbc); lower it to darken.
-const VAL = '#a0a0a0'
+// Typed-value ink, matching JaynathSlip. The weighbridge's dot-matrix ribbon
+// is worn, so values read as grey rather than black — but the glyphs are built
+// from isolated dots, and a pale grey (#a0a0a0 here before) printed as
+// scattered specks because the printer dropped dots below that weight. This
+// mid grey still reads lighter than the pre-printed labels while holding the
+// strokes together. Lower it to darken; going lighter breaks the characters up.
+const VAL = '#6e6e6e'
 
 // Design canvas: scan is 1054x568 px -> 850x458 pt (scale 0.8065).
 // All absolute coordinates below are in this canvas space.
@@ -56,15 +52,14 @@ const S = StyleSheet.create({
 
   // ---- fields box ----
   lbl: { position: 'absolute', fontSize: 13, fontFamily: 'Helvetica-Bold', color: INK },
-  // Typed values use the LX-310 draft face. Size and letter spacing are set so
-  // the character pitch matches the weighbridge computer's print head as
-  // measured on a photographed real slip: 13.2pt per character cell in canvas
-  // units (fontSize 13 em-advance + 0.25 spacing). Every value carries an
-  // explicit width so react-pdf lays it out on one line — without one, a value
-  // near the right edge wraps or is clipped mid-character.
-  val: { position: 'absolute', fontSize: 13, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.25, width: 220 },
+  // Typed values use the LX-310 draft face at the same size and letter spacing
+  // as JaynathSlip's values (13.5pt + 1pt), which matches the printed slip.
+  // Every value carries an explicit width so react-pdf lays it out on one line
+  // — without one, a value near the right edge wraps or is clipped
+  // mid-character.
+  val: { position: 'absolute', fontSize: 13.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1, width: 220 },
   wLbl: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica-Bold', color: INK },
-  wVal: { position: 'absolute', fontSize: 13, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.25, width: 220 },
+  wVal: { position: 'absolute', fontSize: 13.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1, width: 220 },
   icon: { position: 'absolute' },
 
   // ---- notes ----
@@ -145,9 +140,12 @@ const V = {
   // pitch, measured off a test print: 43.4pt from gross to tare and 40.6pt
   // from tare to net. Earlier these were 48.7 and 28.3, which is why the tare
   // line drifted well below its label while net crowded up against it.
-  gross: 95,
-  tare: 138.4,
-  net: 179,
+  // All three shifted up 8pt from the measured positions: on the printed slip
+  // the net row was dropping into the footer notes. The pitch between them is
+  // unchanged, so they still line up with their own labels.
+  gross: 87,
+  tare: 130.4,
+  net: 171,
   // Column positions, all in one coordinate system. These are deliberately
   // NOT adjusted to stop values overlapping labels in the 'full' preview —
   // only the printed 'values' overlay matters, and there the labels come from
@@ -215,12 +213,36 @@ function WeighRowLabels({ y, icon, label, kg, date, time }) {
 
 // Dynamic half of a weigh row: weight, date and time values. y is the
 // machine print line (V.gross / V.tare / V.net), not the label row.
+// Fake bold, as in JaynathSlip. react-pdf has no text-shadow, so the extra
+// strikes are real <Text> layers drawn at the same position plus a sub-point
+// offset. The dot-matrix glyphs are built from isolated dots: printed as a
+// single strike they came out as scattered specks with broken strokes, and
+// these extra passes close the gaps.
+const BOLD_OFFSETS = [[0.35, 0], [0, 0.35]]
+
+function Val({ style, children }) {
+  const flat = Object.assign({}, ...[].concat(style).filter(Boolean))
+  return (
+    <>
+      <Text style={flat}>{children}</Text>
+      {BOLD_OFFSETS.map(([dx, dy], i) => (
+        <Text
+          key={i}
+          style={{ ...flat, left: (flat.left || 0) + dx, top: (flat.top || 0) + dy }}
+        >
+          {children}
+        </Text>
+      ))}
+    </>
+  )
+}
+
 function WeighRowValues({ y, value, date, dateVal, time, timeVal, color }) {
   return (
     <>
-      <Text style={[S.wVal, WT, { top: y, color }]}>{value || ' '}</Text>
-      {date && <Text style={[S.wVal, { left: V.dateX, top: y, color }]}>{dateVal || ' '}</Text>}
-      {time && <Text style={[S.wVal, { left: V.timeX, top: y, color }]}>{timeVal || ' '}</Text>}
+      <Val style={[S.wVal, WT, { top: y, color }]}>{value || ' '}</Val>
+      {date && <Val style={[S.wVal, { left: V.dateX, top: y, color }]}>{dateVal || ' '}</Val>}
+      {time && <Val style={[S.wVal, { left: V.timeX, top: y, color }]}>{timeVal || ' '}</Val>}
     </>
   )
 }
@@ -320,14 +342,14 @@ export default function AmbikaSlip({ data, mode = 'full', offsetX = 0, offsetY =
 
           {showValues && (
             <View style={{ position: 'absolute', left: FIT_X + offsetX, top: FIT_Y + offsetY, width: PAGE_W, height: BOX.height }}>
-              <Text style={[S.val, { left: V.serialX, top: V.line1, color: vColor }]}>{data.serialNo || ' '}</Text>
-              <Text style={[S.val, RIGHT, { top: V.line1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
-              <Text style={[S.val, { left: V.partyX, top: V.line2, width: 500, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.val, RIGHT, { top: V.line2, color: vColor }]}>{data.material || ' '}</Text>
+              <Val style={[S.val, { left: V.serialX, top: V.line1, color: vColor }]}>{data.serialNo || ' '}</Val>
+              <Val style={[S.val, RIGHT, { top: V.line1, color: vColor }]}>{data.vehicleNo || ' '}</Val>
+              <Val style={[S.val, { left: V.partyX, top: V.line2, width: 500, color: vColor }]}>{data.party || ' '}</Val>
+              <Val style={[S.val, RIGHT, { top: V.line2, color: vColor }]}>{data.material || ' '}</Val>
               <WeighRowValues y={V.gross} value={data.gross} date dateVal={fmtDate(data.grossDate)} time timeVal={fmtTime(data.grossTime)} color={vColor} />
               <WeighRowValues y={V.tare} value={data.tare} date dateVal={fmtDate(data.tareDate)} time timeVal={fmtTime(data.tareTime)} color={vColor} />
               <WeighRowValues y={V.net} value={data.net} color={vColor} />
-              <Text style={[S.wVal, RIGHT, { top: V.net, color: vColor }]}>{data.charges || ' '}</Text>
+              <Val style={[S.wVal, RIGHT, { top: V.net, color: vColor }]}>{data.charges || ' '}</Val>
             </View>
           )}
         </View>

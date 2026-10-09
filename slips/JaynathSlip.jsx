@@ -43,17 +43,17 @@ const S = StyleSheet.create({
   rule: { position: 'absolute', left: 8, width: PAGE_W - 16, height: 1.5, backgroundColor: INK },
 
   lbl: { position: 'absolute', fontSize: 13.5, fontFamily: 'Helvetica-Bold', color: INK },
-  // One size for every typed field, matching JaynathPreview's VAL_SIZE — see
-  // the note there for how it was derived from the scan. letterSpacing is 0
-  // because DotMatrix is monospaced at one em per character cell, so the
-  // advance is already the printer's pitch.
-  val: { position: 'absolute', fontSize: 8.5, fontFamily: 'DotMatrix', color: VAL },
-  // The dates are NOT condensed on the original — they measured the same cap
-  // height as every other value. The 17 CPI mode this used to emulate was only
-  // needed because the values were set at 14pt, where a 10-char date from
-  // x=575 ran 149pt wide and collided with the time at x=700. At 8.5pt the
-  // same date is 85pt and ends at 660, so the collision is gone.
-  valNarrow: { position: 'absolute', fontSize: 8.5, fontFamily: 'DotMatrix', color: VAL },
+  // Sized to match MurlidharSlip, whose printed values come out clearly legible.
+  // The 8.5pt this used to be was derived from a scan measurement, but on paper
+  // it printed too small and faint to read.
+  val: { position: 'absolute', fontSize: 13.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Dates and times run slightly condensed. A 10-char date from x=559 ends at
+  // 683 at this size, so the time column sits at 696 to leave a clear gap —
+  // when they were closer the two strings ran together with no space between.
+  valNarrow: { position: 'absolute', fontSize: 12, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
+  // GROSS / TARE / NET print noticeably larger than every other typed field —
+  // on the slip the digits stand well above the 13.5pt labels beside them.
+  valWeight: { position: 'absolute', fontSize: 18, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
 
   guj: { position: 'absolute', fontSize: 10.5, fontFamily: 'NotoGujarati', fontWeight: 400, color: INK },
   lat: { position: 'absolute', fontSize: 11.5, fontFamily: 'Helvetica', color: INK },
@@ -85,15 +85,20 @@ const BOLD_OFFSETS = {
   xstrong: [[0.45, 0], [0, 0.45], [0.45, 0.45], [0.22, 0.22]],
 }
 const VAL_BOLD = 'strong'
+// The printed overlay gets a single strike: on the real slip the ribbon lays
+// down a light, thin character, and overstriking it came out far heavier than
+// the machine's own output. The on-screen preview keeps VAL_BOLD so the faded
+// blue values stay readable on a monitor.
+const VAL_BOLD_PRINT = 'normal'
 
-// One typed value, struck VAL_BOLD times. `style` is the usual array of styles;
+// One typed value, struck `bold` times. `style` is the usual array of styles;
 // left/top come from it, and each extra pass re-reads them so the offset
 // applies on top of whatever the caller positioned. Right-aligned fields (the
 // WT column) carry width + textAlign in the same style array, so the overstrike
 // stays aligned with the base pass without any special handling here.
-function Val({ style, children }) {
+function Val({ style, bold = VAL_BOLD, children }) {
   const flat = Object.assign({}, ...[].concat(style).filter(Boolean))
-  const offs = BOLD_OFFSETS[VAL_BOLD] || []
+  const offs = BOLD_OFFSETS[bold] || []
   return (
     <>
       <Text style={flat}>{children}</Text>
@@ -109,12 +114,11 @@ function Val({ style, children }) {
   )
 }
 
-// GROSS / TARE / NET print as one right-aligned column ending at 425, 15pt
-// before the "Gross Date" / "Tare Date" / "Charges" label column at 440. They
-// print at the same size as every other value — the original shows no size
-// change here. Right-aligning (rather than leaving them left-aligned at 215)
-// lines their last digits up whatever the digit count.
-const WT = { left: 215 - 62, width: 210, textAlign: 'right' }
+// GROSS / TARE / NET are LEFT-aligned at the same column as the ticket and
+// vehicle values above them — measured off an original printed slip, where all
+// four start together just after the colon rather than ranging right. They are
+// set larger than the other values; see S.valWeight.
+const WT = { left: 160 }
 
 // Label column origins. The outer border sits at x=8 with a 1.5pt rule, so 18
 // puts the left column hard against it with a small breathing margin. The
@@ -128,13 +132,25 @@ const MID_COLON = MID_LBL + 108
 const LEFT_DX = LEFT_LBL - 80
 const MID_DX = MID_LBL - 440
 
+// Registration correction for the 'values' overlay ONLY — the mode that prints
+// onto the pre-printed paper. The column positions below are measured off an
+// original machine-printed slip, but the pre-printed stationery feeds a little
+// right of where the design canvas assumes, so the whole layer shifts left to
+// compensate. The 'full'/'blank' previews keep the unshifted coordinates.
+const VALUES_DX = -82
+
 // mode: 'full' | 'blank' (stationery master) | 'values' (dot-matrix overlay)
 // offsetX/offsetY (pt): tractor-feed alignment nudge, values layer only
 export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  const vColor = isValues ? '#000000' : VAL
+  // The real machine's ribbon lays down a pale, thin strike — on the original
+  // slip the typed values read much lighter than the pre-printed blue labels.
+  // Mid grey reproduces that; darker greys printed heavier than the machine.
+  const vColor = isValues ? '#8a8a8a' : VAL
+  // Single strike on paper, faked bold on screen — see VAL_BOLD_PRINT.
+  const vBold = isValues ? VAL_BOLD_PRINT : VAL_BOLD
 
   return (
     <Document>
@@ -234,20 +250,20 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
         )}
 
         {showValues && (
-          <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
-            <Val style={[S.val, { left: 215 + LEFT_DX, top: 142, color: vColor }]}>{data.serialNo || ' '}</Val>
-            <Val style={[S.val, { left: 230 + LEFT_DX, top: 170, color: vColor }]}>{data.party || ' '}</Val>
-            <Val style={[S.val, { left: 215 + LEFT_DX, top: 214, color: vColor }]}>{data.vehicleNo || ' '}</Val>
-            <Val style={[S.val, WT, { top: 257, color: vColor }]}>{data.gross || ' '}</Val>
-            <Val style={[S.val, WT, { top: 300, color: vColor }]}>{data.tare || ' '}</Val>
-            <Val style={[S.val, WT, { top: 343, color: vColor }]}>{data.net || ' '}</Val>
-            <Val style={[S.val, { left: 585 + MID_DX, top: 158, color: vColor }]}>{data.supplierName || ' '}</Val>
-            <Val style={[S.val, { left: 585 + MID_DX, top: 202, color: vColor }]}>{data.material || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 575 + MID_DX, top: 246, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 700 + MID_DX, top: 246, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 575 + MID_DX, top: 288, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Val>
-            <Val style={[S.valNarrow, { left: 700 + MID_DX, top: 288, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
-            <Val style={[S.val, { left: 700 + MID_DX, top: 330, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Val>
+          <View style={{ position: 'absolute', left: offsetX + (isValues ? VALUES_DX : 0), top: offsetY, width: PAGE_W, height: PAGE_H }}>
+            <Val bold={vBold} style={[S.val, { left: 148, top: 134, color: vColor }]}>{data.serialNo || ' '}</Val>
+            <Val bold={vBold} style={[S.val, { left: 148, top: 162, color: vColor }]}>{data.party || ' '}</Val>
+            <Val bold={vBold} style={[S.val, { left: 148, top: 206, color: vColor }]}>{data.vehicleNo || ' '}</Val>
+            <Val bold={vBold} style={[S.valWeight, WT, { top: 249, color: vColor }]}>{data.gross || ' '}</Val>
+            <Val bold={vBold} style={[S.valWeight, WT, { top: 292, color: vColor }]}>{data.tare || ' '}</Val>
+            <Val bold={vBold} style={[S.valWeight, WT, { top: 335, color: vColor }]}>{data.net || ' '}</Val>
+            <Val bold={vBold} style={[S.val, { left: 585 + MID_DX, top: 158, color: vColor }]}>{data.supplierName || ' '}</Val>
+            <Val bold={vBold} style={[S.val, { left: 585 + MID_DX, top: 202, color: vColor }]}>{data.material || ' '}</Val>
+            <Val bold={vBold} style={[S.valNarrow, { left: 559, top: 246, color: vColor }]}>{fmtDateSlash(data.grossDate) || ' '}</Val>
+            <Val bold={vBold} style={[S.valNarrow, { left: 696, top: 246, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
+            <Val bold={vBold} style={[S.valNarrow, { left: 559, top: 288, color: vColor }]}>{fmtDateSlash(data.tareDate) || ' '}</Val>
+            <Val bold={vBold} style={[S.valNarrow, { left: 696, top: 288, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
+            <Val bold={vBold} style={[S.val, { left: 700 + MID_DX, top: 330, color: vColor }]}>{fmtCharges(data.charges) || ' '}</Val>
           </View>
         )}
 

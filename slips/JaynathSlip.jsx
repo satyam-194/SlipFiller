@@ -47,13 +47,16 @@ const S = StyleSheet.create({
   // The 8.5pt this used to be was derived from a scan measurement, but on paper
   // it printed too small and faint to read.
   val: { position: 'absolute', fontSize: 13.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  // Ticket / customer / vehicle print smaller than the right-hand fields — on
+  // the slip they are the lightest, finest text on the form.
+  valLeft: { position: 'absolute', fontSize: 11, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.6 },
   // Dates and times run slightly condensed. A 10-char date from x=559 ends at
   // 683 at this size, so the time column sits at 696 to leave a clear gap —
   // when they were closer the two strings ran together with no space between.
   valNarrow: { position: 'absolute', fontSize: 12, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 0.4 },
   // GROSS / TARE / NET print noticeably larger than every other typed field —
   // on the slip the digits stand well above the 13.5pt labels beside them.
-  valWeight: { position: 'absolute', fontSize: 18, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
+  valWeight: { position: 'absolute', fontSize: 15.5, fontFamily: 'DotMatrix', color: VAL, letterSpacing: 1 },
 
   guj: { position: 'absolute', fontSize: 10.5, fontFamily: 'NotoGujarati', fontWeight: 400, color: INK },
   lat: { position: 'absolute', fontSize: 11.5, fontFamily: 'Helvetica', color: INK },
@@ -147,8 +150,9 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
   const showValues = mode !== 'blank'
   // The real machine's ribbon lays down a pale, thin strike — on the original
   // slip the typed values read much lighter than the pre-printed blue labels.
-  // Mid grey reproduces that; darker greys printed heavier than the machine.
-  const vColor = isValues ? '#8a8a8a' : VAL
+  // This pale grey reproduces that; darker greys printed heavier than the
+  // machine. Going much lighter risks thin strokes dropping out on the printer.
+  const vColor = isValues ? '#a8a8a8' : VAL
   // Single strike on paper, faked bold on screen — see VAL_BOLD_PRINT.
   const vBold = isValues ? VAL_BOLD_PRINT : VAL_BOLD
 
@@ -251,9 +255,9 @@ export default function JaynathSlip({ data, mode = 'full', offsetX = 0, offsetY 
 
         {showValues && (
           <View style={{ position: 'absolute', left: offsetX + (isValues ? VALUES_DX : 0), top: offsetY, width: PAGE_W, height: PAGE_H }}>
-            <Val bold={vBold} style={[S.val, { left: 148, top: 134, color: vColor }]}>{data.serialNo || ' '}</Val>
-            <Val bold={vBold} style={[S.val, { left: 148, top: 162, color: vColor }]}>{data.party || ' '}</Val>
-            <Val bold={vBold} style={[S.val, { left: 148, top: 206, color: vColor }]}>{data.vehicleNo || ' '}</Val>
+            <Val bold={vBold} style={[S.valLeft, { left: 148, top: 134, color: vColor }]}>{data.serialNo || ' '}</Val>
+            <Val bold={vBold} style={[S.valLeft, { left: 148, top: 162, color: vColor }]}>{data.party || ' '}</Val>
+            <Val bold={vBold} style={[S.valLeft, { left: 148, top: 206, color: vColor }]}>{data.vehicleNo || ' '}</Val>
             <Val bold={vBold} style={[S.valWeight, WT, { top: 249, color: vColor }]}>{data.gross || ' '}</Val>
             <Val bold={vBold} style={[S.valWeight, WT, { top: 292, color: vColor }]}>{data.tare || ' '}</Val>
             <Val bold={vBold} style={[S.valWeight, WT, { top: 335, color: vColor }]}>{data.net || ' '}</Val>

@@ -9,7 +9,7 @@ const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white background for center container
 // Masthead and the 100 / 5 MATRIC TON corner boxes share one brownish tone,
 // measured off the supplied title artwork — mirrors SIDE_TXT in the PDF slip.
-const SIDE_TXT = '#9a6f64'
+const SIDE_TXT = '#914c44'
 const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
 const PAGE_W = 850
@@ -212,7 +212,7 @@ export default function JaySatyanarayanPreview({ data }) {
               fontSize: 15.5,
               fontWeight: 800,
               fontFamily: SANS,
-              color: INK,
+              color: SIDE_TXT,
               textAlign: 'center',
               lineHeight: 1,
               marginTop: 11,
@@ -331,7 +331,7 @@ export default function JaySatyanarayanPreview({ data }) {
             boxSizing: 'border-box',
           }}
         >
-          <span style={{ fontSize: 11.5, fontWeight: 700, color: INK, lineHeight: 1 }}>Sevice</span>
+          <span style={{ fontSize: 11.5, fontWeight: 700, color: INK, lineHeight: 1 }}>Service</span>
           <span style={{ fontSize: 28, fontWeight: 900, color: INK, lineHeight: 1, margin: '2px 0' }}>24</span>
           <span style={{ fontSize: 11, fontWeight: 700, color: INK, lineHeight: 1 }}>Hours</span>
         </div>

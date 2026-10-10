@@ -12,7 +12,7 @@ const PAPER = '#ffffff'        // Pure white continuous paper for center contain
 // Masthead and the 100 / 5 MATRIC TON corner boxes share one brownish tone,
 // measured off the supplied title artwork — distinct from the red INK the
 // rest of the form prints in.
-const SIDE_TXT = '#9a6f64'
+const SIDE_TXT = '#914c44'
 const VAL = '#1a1a1a'          // Dark charcoal for values
 
 const PAGE_W = 850
@@ -111,7 +111,7 @@ const S = StyleSheet.create({
     lineHeight: 1,
     fontSize: 15.5,
     fontFamily: 'Helvetica-Bold',
-    color: INK,
+    color: SIDE_TXT,
     textAlign: 'center',
     marginTop: 11,
     letterSpacing: 1.2,
@@ -338,7 +338,7 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
 
             {/* Service 24 Hours Box (same pink background as footer/header) */}
             <View style={S.serviceBox}>
-              <Text style={S.serviceTxt}>Sevice</Text>
+              <Text style={S.serviceTxt}>Service</Text>
               <Text style={S.serviceNum}>24</Text>
               <Text style={S.hoursTxt}>Hours</Text>
             </View>

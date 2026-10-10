@@ -227,13 +227,125 @@ const NOTE_LINES = [
   'ગાડીનું ખાલી તથા ભરેલું વજન ૨૪ કલાકની અંદર કરાવી લેવું.',
 ]
 
+// Registration correction for the 'values' overlay ONLY — the mode that prints
+// onto the pre-printed paper. The typed values landed high and right of their
+// fields on the printed samples, so the whole layer shifts down and left. Same
+// correction scheme SatyanarayanSlip uses.
+const VALUES_DX = -34
+const VALUES_DY = 40
+
+// Value ink and weight. This machine's ribbon is fresh — on the printed sample
+// the typed values come out near-solid black with thick strokes, heavier and
+// darker than the pre-printed crimson labels, not the worn mid-grey the other
+// slips show. So: near-black ink and the four-pass overstrike, which fills the
+// gaps between the dot-matrix dots into continuous strokes.
+const VAL_INK = '#171717'
+const BOLD_OFFSETS = {
+  normal: [],
+  strong: [[0.35, 0], [0, 0.35]],
+  xstrong: [[0.45, 0], [0, 0.45], [0.45, 0.45], [0.22, 0.22]],
+}
+const VAL_BOLD = 'xstrong'
+
+// One typed value, struck `bold` times. `style` is the usual array of styles;
+// left/top come from it, and each extra pass re-reads them so the offset
+// applies on top of whatever the caller positioned. Right-aligned fields (the
+// WT column) carry width + textAlign in the same style array, so the
+// overstrike stays aligned with the base pass without special handling.
+function Val({ style, bold = 'normal', children }) {
+  const flat = Object.assign({}, ...[].concat(style).filter(Boolean))
+  const offs = BOLD_OFFSETS[bold] || []
+  return (
+    <>
+      <Text style={flat}>{children}</Text>
+      {offs.map(([dx, dy], i) => (
+        <Text
+          key={i}
+          style={{ ...flat, left: (flat.left || 0) + dx, top: (flat.top || 0) + dy }}
+        >
+          {children}
+        </Text>
+      ))}
+    </>
+  )
+}
+
+// Per-field registration on top of the whole-layer shift above — the machine's
+// own field positions do not line up uniformly with the pre-printed boxes, so
+// these fields need their own correction. Values mode only.
+const SERIAL_DY = -10        // serial no. sits low in its field
+const VEHICLE_DX = -74       // vehicle no. runs far right of the VEHICLE NO. box
+const VEHICLE_DY = -28
+const DT_DX = 30             // date column sits left of and below its label
+const DT_DY = -20
+// The TIME runs print further left than the design column puts them, though
+// not as far as the first correction assumed — they pull back right toward
+// their TIME : label. Shares DT_DY so both lines rise together.
+const TIME_DX = -58
+const CHARGES_DY = -12       // charges line sits low on the NET row
+
+// The vehicle registration prints larger than the other condensed values on
+// this machine; it is the one field set at the normal pitch rather than 17 CPI.
+// An absolute size rather than a scale — a touch above the 9.5pt regular
+// values, so the plate reads clearly on the printed slip.
+const VEHICLE_PT = 10.5
+
+// The real machine types the values at a much smaller pitch than the sizes
+// tuned for the on-screen 'full' composite. On printed samples the typed values
+// stand about the same height as the pre-printed 15pt labels beside them, which
+// puts the cell near 9.5pt — so the overlay scales to ~0.63 of the design size.
+const VALUES_SCALE = 9.5 / 15
+
+// The weighing software does enlarge the weight figures, but only slightly —
+// on the sample "1950" is barely taller than the date beside it, nothing like
+// the 20/15 ratio the composite uses. Scaled against the regular value cell.
+const WEIGHT_SCALE = 11.5 / 20
+
+// Text is top-anchored, so shrinking the weight cell from 20pt lifts its
+// baseline by roughly the size difference. Push it back down to keep the
+// figures sitting on the same line they were tuned to.
+const WEIGHT_DY = (20 - 20 * WEIGHT_SCALE) * 0.8
+
+// Same correction for the regular 15pt and condensed 11pt value cells.
+const VALUE_DY = (15 - 15 * VALUES_SCALE) * 0.8
+const NARROW_DY = (11 - 11 * VALUES_SCALE) * 0.8
+
 // mode: 'full' (design + values), 'blank' (pre-print stationery master),
-//       'values' (dot-matrix overlay: white page, values only, black ink)
+//       'values' (dot-matrix overlay: white page, values only, grey ink)
 export default function ViratSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  const vColor = isValues ? '#000000' : VAL
+  // Grey + overstrike in the overlay, matching JaynathSlip's printed values.
+  const vColor = isValues ? VAL_INK : VAL
+  const vBold = isValues ? VAL_BOLD : 'normal'
+
+  // Shrink only the overlay; the 'full' composite keeps its tuned sizes.
+  // Letter-spacing scales with the cell — the design's 1pt gap at 15pt reads as
+  // a visible gap at 9.5pt and breaks the run into separate characters.
+  const vScale = isValues
+    ? { fontSize: S.val.fontSize * VALUES_SCALE, letterSpacing: 0.6, marginTop: VALUE_DY }
+    : null
+  const wScale = isValues
+    ? { fontSize: S.wVal.fontSize * WEIGHT_SCALE, letterSpacing: 0.8, marginTop: WEIGHT_DY }
+    : null
+  const nScale = isValues
+    ? { fontSize: S.valNarrow.fontSize * VALUES_SCALE, letterSpacing: 0.25, marginTop: NARROW_DY }
+    : null
+
+  // The registration prints at a larger pitch than the other condensed values.
+  // Its baseline nudge is computed from its own size — reusing nScale's would
+  // apply a drop sized for the 7pt cell to a field that barely shrinks.
+  const vehScale = isValues
+    ? {
+        fontSize: VEHICLE_PT,
+        letterSpacing: 0.5,
+        marginTop: (S.valNarrow.fontSize - VEHICLE_PT) * 0.8,
+      }
+    : null
+
+  // Per-field nudges collapse to zero outside the overlay.
+  const v = (n) => (isValues ? n : 0)
 
   return (
     <Document>
@@ -286,29 +398,29 @@ export default function ViratSlip({ data, mode = 'full', offsetX = 0, offsetY = 
           )}
 
           {showValues && (
-            <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: BOX.width, height: BOX.height }}>
-              <Text style={[S.val, { left: L.value, top: ROWS.serial - 1, color: vColor }]}>{data.serialNo || ' '}</Text>
-              <Text style={[S.val, { left: L.value, top: ROWS.party - 1, color: vColor }]}>{data.party || ' '}</Text>
-              <Text style={[S.valNarrow, { left: R.value, top: R.vehicle + 1, color: vColor }]}>{data.vehicleNo || ' '}</Text>
-              <Text style={[S.val, { left: R.value, top: R.material - 1, color: vColor }]}>{data.material || ' '}</Text>
+            <View style={{ position: 'absolute', left: offsetX + (isValues ? VALUES_DX : 0), top: offsetY + (isValues ? VALUES_DY : 0), width: BOX.width, height: BOX.height }}>
+              <Val bold={vBold} style={[S.val, vScale, { left: L.value, top: ROWS.serial - 1 + v(SERIAL_DY), color: vColor }]}>{data.serialNo || ' '}</Val>
+              <Val bold={vBold} style={[S.val, vScale, { left: L.value, top: ROWS.party - 1, color: vColor }]}>{data.party || ' '}</Val>
+              <Val bold={vBold} style={[S.valNarrow, vehScale, { left: R.value + v(VEHICLE_DX), top: R.vehicle + 1 + v(VEHICLE_DY), color: vColor }]}>{data.vehicleNo || ' '}</Val>
+              <Val bold={vBold} style={[S.val, vScale, { left: R.value, top: R.material - 1, color: vColor }]}>{data.material || ' '}</Val>
 
               {/* Weight figures print above their row's label line */}
-              <Text style={[S.wVal, WT, { top: ROW.gross - 30, color: vColor }]}>{data.gross || ' '}</Text>
-              <Text style={[S.val, { left: COL.dateVal, top: ROW.gross - 14, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
-              <Text style={[S.val, { left: COL.timeVal, top: ROW.gross + 2, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
+              <Val bold={vBold} style={[S.wVal, WT, wScale, { top: ROW.gross - 30, color: vColor }]}>{data.gross || ' '}</Val>
+              <Val bold={vBold} style={[S.val, vScale, { left: COL.dateVal + v(DT_DX), top: ROW.gross - 14 + v(DT_DY), color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Val>
+              <Val bold={vBold} style={[S.val, vScale, { left: COL.timeVal + v(TIME_DX), top: ROW.gross + 2 + v(DT_DY), color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
 
-              <Text style={[S.wVal, WT, { top: ROW.tare - 12, color: vColor }]}>{data.tare || ' '}</Text>
-              <Text style={[S.val, { left: COL.dateVal, top: ROW.tare + 6, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-              <Text style={[S.val, { left: COL.timeVal, top: ROW.tare + 6, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+              <Val bold={vBold} style={[S.wVal, WT, wScale, { top: ROW.tare - 12, color: vColor }]}>{data.tare || ' '}</Val>
+              <Val bold={vBold} style={[S.val, vScale, { left: COL.dateVal + v(DT_DX), top: ROW.tare + 6 + v(DT_DY), color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Val>
+              <Val bold={vBold} style={[S.val, vScale, { left: COL.timeVal + v(TIME_DX), top: ROW.tare + 6 + v(DT_DY), color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
 
-              <Text style={[S.wVal, WT, { top: ROW.net - 11, color: vColor }]}>{data.net || ' '}</Text>
+              <Val bold={vBold} style={[S.wVal, WT, wScale, { top: ROW.net - 11, color: vColor }]}>{data.net || ' '}</Val>
 
               {/* The weighing software prints the CHARGES label with the
                   amount — it is not part of the pre-printed stationery */}
               {data.charges ? (
                 <>
-                  <Text style={[S.valNarrow, { left: CHARGES.label, top: CHARGES.top + 2, color: vColor }]}>CHARGES (Rs.) :</Text>
-                  <Text style={[S.valNarrow, { left: CHARGES.value, top: CHARGES.top + 2, color: vColor }]}>{data.charges}/-</Text>
+                  <Val bold={vBold} style={[S.valNarrow, nScale, { left: CHARGES.label, top: CHARGES.top + 2 + v(CHARGES_DY), color: vColor }]}>CHARGES (Rs.) :</Val>
+                  <Val bold={vBold} style={[S.valNarrow, nScale, { left: CHARGES.value, top: CHARGES.top + 2 + v(CHARGES_DY), color: vColor }]}>{data.charges}/-</Val>
                 </>
               ) : null}
             </View>

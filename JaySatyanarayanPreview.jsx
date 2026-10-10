@@ -43,7 +43,7 @@ const val = {
   letterSpacing: 1,
 }
 // Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
-const valNarrow = { ...val, fontSize: 9.5, letterSpacing: 0.2 }
+const valNarrow = { ...val, fontSize: 12, letterSpacing: 0.4 }
 
 // Footer note row — mirrors noteRow + gujText in the PDF slip, including its
 // lineHeight, so the two render the text block identically.
@@ -61,7 +61,10 @@ const noteRow = {
 // GROSS / TARE / NET share one right-aligned column ending at 375, so the
 // figures sit just left of "DATE :" (390) with a 15pt gap and their right
 // edges line up regardless of digit count. Mirrors WT in the PDF.
-const WT = { left: 150, width: 165, textAlign: 'right' }
+// GROSS / TARE / NET are LEFT-aligned in the same column as the serial and
+// supplier values above them, as on the original slip — right-aligning them
+// pushed the figures to the far side of the column, well right of that stack.
+const WT = { left: 150 }
 
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
@@ -242,7 +245,7 @@ export default function JaySatyanarayanPreview({ data }) {
         <div style={{ ...lbl, left: 36, top: 140 }}>RST NO.  :</div>
         <div style={{ ...val, left: 150, top: 140 }}>{data.serialNo || ''}</div>
         <div style={{ ...lbl, left: 540, top: 140 }}>VEHICLE NO. :</div>
-        <div style={{ ...valNarrow, left: 680, top: 143 }}>{data.vehicleNo || ''}</div>
+        <div style={{ ...valNarrow, left: 640, top: 143 }}>{data.vehicleNo || ''}</div>
 
         {/* Row 2: SUPPLIER & MATERIAL */}
         <div style={{ ...lbl, left: 36, top: 164 }}>SUPPLIER :</div>

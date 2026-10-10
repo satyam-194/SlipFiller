@@ -143,11 +143,12 @@ const S = StyleSheet.create({
   // Condensed pitch (the printer's 17 CPI mode) for the VEHICLE NO. run: a
   // 13-char registration from x=680 is 188pt at the normal size and would end
   // at 868, well past the 850 canvas. At 9.5/0.2 it is 126pt and ends at 806.
+  // Same condensed pitch JaynathSlip uses for its dates and times.
   valNarrow: {
     position: 'absolute',
-    fontSize: 9.5,
+    fontSize: 12,
     fontFamily: 'DotMatrix',
-    letterSpacing: 0.2,
+    letterSpacing: 0.4,
   },
 
   // Gujarati terms
@@ -235,7 +236,10 @@ const S = StyleSheet.create({
 // Right-aligning the column puts every figure's last digit on a common edge
 // at 375, leaving a 15pt gap before the DATE label — the weights sit directly
 // to the left of the date, which is where the weighing software prints them.
-const WT = { left: 150, width: 165, textAlign: 'right' }
+// GROSS / TARE / NET are LEFT-aligned in the same column as the serial and
+// supplier values above them, as on the original slip — right-aligning them
+// pushed the figures to the far side of the column, well right of that stack.
+const WT = { left: 150 }
 
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
@@ -249,11 +253,42 @@ const fmtTime = (t) => {
   return `${String(h % 12 || 12).padStart(2, '0')}:${m.slice(0, 2)} ${ap}`
 }
 
+// Fake bold, as in JaynathSlip. react-pdf has no text-shadow, so the extra
+// strikes are real <Text> layers drawn at the same position plus a sub-point
+// offset. The dot-matrix glyphs are built from isolated dots; printed as a
+// single strike they come out as scattered specks with broken strokes, and
+// these extra passes close the gaps.
+const BOLD_OFFSETS = [[0.35, 0], [0, 0.35]]
+
+function Val({ style, children }) {
+  const flat = Object.assign({}, ...[].concat(style).filter(Boolean))
+  return (
+    <>
+      <Text style={flat}>{children}</Text>
+      {BOLD_OFFSETS.map(([dx, dy], i) => (
+        <Text key={i} style={{ ...flat, left: (flat.left || 0) + dx, top: (flat.top || 0) + dy }}>
+          {children}
+        </Text>
+      ))}
+    </>
+  )
+}
+
+// Registration correction for the 'values' overlay ONLY — the mode that prints
+// onto the pre-printed paper. Measured from a printed sample: the typed values
+// landed left of and above their fields, so the layer shifts right and down.
+// The 'full'/'blank' previews keep the unshifted coordinates.
+const VALUES_DX = -59
+const VALUES_DY = 10
+
 export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, offsetY = 0, debug = false, pageMode = 'landscape' }) {
   const isValues = mode === 'values'
   const showStatic = mode !== 'values'
   const showValues = mode !== 'blank'
-  const vColor = isValues ? '#000000' : VAL
+  // Pale grey — the real machine's ribbon is worn, so values read much lighter
+  // than the pre-printed labels. The overstrike above keeps the dot-matrix
+  // strokes from breaking up at this weight; going much paler drops dots.
+  const vColor = isValues ? '#8c8c8c' : VAL
 
   const supplierValue = data.supplierName || data.party || ''
 
@@ -350,31 +385,31 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
 
         {/* Dynamic Values (Dot-matrix overlay) */}
         {showValues && (
-          <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
+          <View style={{ position: 'absolute', left: offsetX + (isValues ? VALUES_DX : 0), top: offsetY + (isValues ? VALUES_DY : 0), width: PAGE_W, height: PAGE_H }}>
             {/* Row 1 Values */}
-            <Text style={[S.val, { left: 150, top: 140, color: vColor }]}>{data.serialNo || ' '}</Text>
-            <Text style={[S.valNarrow, { left: 680, top: 143, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+            <Val style={[S.val, { left: 150, top: 140, color: vColor }]}>{data.serialNo || ' '}</Val>
+            <Val style={[S.valNarrow, { left: 640, top: 143, color: vColor }]}>{data.vehicleNo || ' '}</Val>
 
             {/* Row 2 Values */}
-            <Text style={[S.val, { left: 150, top: 164, color: vColor }]}>{supplierValue || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Text>
+            <Val style={[S.val, { left: 150, top: 164, color: vColor }]}>{supplierValue || ' '}</Val>
+            <Val style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Val>
 
             {/* Row 3 Values (GROSS) */}
-            <Text style={[S.val, WT, { top: 204, color: vColor }]}>{data.gross || ' '}</Text>
-            <Text style={[S.val, { left: 395, top: 204, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
-            <Text style={[S.val, { left: 630, top: 204, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
+            <Val style={[S.val, WT, { top: 204, color: vColor }]}>{data.gross || ' '}</Val>
+            <Val style={[S.val, { left: 395, top: 204, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Val>
+            <Val style={[S.val, { left: 630, top: 204, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Val>
 
             {/* Row 4 Values (TARE) */}
-            <Text style={[S.val, WT, { top: 240, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, { left: 395, top: 240, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-            <Text style={[S.val, { left: 630, top: 240, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+            <Val style={[S.val, WT, { top: 240, color: vColor }]}>{data.tare || ' '}</Val>
+            <Val style={[S.val, { left: 395, top: 240, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Val>
+            <Val style={[S.val, { left: 630, top: 240, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Val>
 
             {/* Row 5 Values (NET & Charges) */}
-            <Text style={[S.val, WT, { top: 276, color: vColor }]}>{data.net || ' '}</Text>
+            <Val style={[S.val, WT, { top: 276, color: vColor }]}>{data.net || ' '}</Val>
             {data.charges ? (
-              <Text style={[S.val, { left: 460, top: 276, color: vColor }]}>
+              <Val style={[S.val, { left: 460, top: 276, color: vColor }]}>
                 {`Charges(Rs) :   ${data.charges}`}
-              </Text>
+              </Val>
             ) : null}
           </View>
         )}

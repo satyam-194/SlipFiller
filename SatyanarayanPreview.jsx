@@ -3,16 +3,16 @@ import SlipScaler from './SlipScaler.jsx'
 import satyanarayanTitle, { satyanarayanTitleAspect } from './satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg (same as JaySatyanarayan)
-const INK = '#d0514f'          // Light red press ink sampled from slip photo
-const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
+const INK = '#c16460'          // Light red press ink sampled from slip photo
+const HEADER_BG = '#fbc8bd'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#fbc8bd'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white background for center container
 const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
 const PAGE_W = 850
 const PAGE_H = 458
 
-const TITLE_W = 560
+const TITLE_W = 615
 
 const GUJ = "'Noto Sans Gujarati', sans-serif"
 const SANS = 'Helvetica, Arial, sans-serif'
@@ -126,11 +126,12 @@ export default function SatyanarayanPreview({ data }) {
           <span style={{ fontSize: 11, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
-        {/* Right Box: 5 MATRIC TON (same background as main background) */}
+        {/* Right Box: 5 MATRIC TON (same background as main background).
+            Positioned from the left, matching the PDF slip's sideBox. */}
         <div
           style={{
             position: 'absolute',
-            right: 24,
+            left: 746,
             top: 20,
             width: 80,
             height: 86,
@@ -210,7 +211,7 @@ export default function SatyanarayanPreview({ data }) {
               color: INK,
               textAlign: 'center',
               lineHeight: 1,
-              marginTop: 12,
+              marginTop: 15,
               letterSpacing: 1.2,
               whiteSpace: 'nowrap',
             }}
@@ -309,11 +310,13 @@ export default function SatyanarayanPreview({ data }) {
           Operator Signature
         </div>
 
-        {/* Service 24 Hours Box (same pink background as footer/header) */}
+        {/* Service 24 Hours Box (same pink background as footer/header).
+            Positioned from the left, like the PDF slip's serviceBox, so the
+            two cannot disagree by a point or two. */}
         <div
           style={{
             position: 'absolute',
-            right: 24,
+            left: 746,
             top: 355,
             width: 78,
             height: 82,

@@ -5,9 +5,9 @@ import PrintPage from './printSpec.jsx'
 import satyanarayanTitle, { satyanarayanTitleAspect } from '../satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg scan
-const INK = '#d0514f'          // Light red press ink sampled from slip photo
-const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
+const INK = '#c16460'          // Light red press ink sampled from slip photo
+const HEADER_BG = '#fbc8bd'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#fbc8bd'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white continuous paper for center container
 const VAL = '#1a1a1a'          // Dark charcoal for values
 
@@ -15,7 +15,7 @@ const PAGE_W = 850
 const PAGE_H = 458
 
 // Rendered width of the title lettering image (height follows its aspect)
-const TITLE_W = 560
+const TITLE_W = 615
 
 const S = StyleSheet.create({
   // Main red border without radius + pink background inside
@@ -109,7 +109,7 @@ const S = StyleSheet.create({
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
-    marginTop: 12,
+    marginTop: 15,
     letterSpacing: 1.2,
   },
 

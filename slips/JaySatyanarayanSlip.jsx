@@ -9,13 +9,17 @@ const INK = '#d0514f'          // Deep crimson red press ink
 const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
 const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white continuous paper for center container
+// Masthead and the 100 / 5 MATRIC TON corner boxes share one brownish tone,
+// measured off the supplied title artwork — distinct from the red INK the
+// rest of the form prints in.
+const SIDE_TXT = '#9a6f64'
 const VAL = '#1a1a1a'          // Dark charcoal for values
 
 const PAGE_W = 850
 const PAGE_H = 458
 
 // Rendered width of the title lettering image (height follows its aspect)
-const TITLE_W = 560
+const TITLE_W = 615
 
 const S = StyleSheet.create({
   // Main red border without radius + pink background inside
@@ -46,19 +50,19 @@ const S = StyleSheet.create({
   sideNum100: {
     fontSize: 38,
     fontFamily: 'Helvetica-Bold',
-    color: INK,
+    color: SIDE_TXT,
     lineHeight: 1,
   },
   sideNum5: {
     fontSize: 42,
     fontFamily: 'Helvetica-Bold',
-    color: INK,
+    color: SIDE_TXT,
     lineHeight: 1,
   },
   sideMatric: {
     fontSize: 11.5,
     fontFamily: 'Helvetica-Bold',
-    color: INK,
+    color: SIDE_TXT,
     textAlign: 'center',
     marginTop: 3,
     letterSpacing: 0.6,
@@ -66,7 +70,7 @@ const S = StyleSheet.create({
   sideTon: {
     fontSize: 11.5,
     fontFamily: 'Helvetica-Bold',
-    color: INK,
+    color: SIDE_TXT,
     textAlign: 'center',
     marginTop: 1,
     letterSpacing: 0.6,
@@ -152,14 +156,14 @@ const S = StyleSheet.create({
     left: 24,
   },
   gujText: {
-    fontSize: 11,
+    fontSize: 12.5,
     fontFamily: 'NotoGujarati',
     fontWeight: 500,
     color: INK,
     lineHeight: 1.2,
   },
   jurisdictionText: {
-    fontSize: 11,
+    fontSize: 12.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     lineHeight: 1.2,
@@ -231,7 +235,7 @@ const S = StyleSheet.create({
 // Right-aligning the column puts every figure's last digit on a common edge
 // at 375, leaving a 15pt gap before the DATE label — the weights sit directly
 // to the left of the date, which is where the weighing software prints them.
-const WT = { left: 150, width: 225, textAlign: 'right' }
+const WT = { left: 150, width: 165, textAlign: 'right' }
 
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
@@ -292,21 +296,21 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
             <Text style={[S.lbl, { left: 540, top: 140 }]}>VEHICLE NO. :</Text>
 
             {/* Row 2: SUPPLIER & MATERIAL */}
-            <Text style={[S.lbl, { left: 36, top: 176 }]}>SUPPLIER :</Text>
-            <Text style={[S.lbl, { left: 560, top: 164 }]}>MATERIAL :</Text>
+            <Text style={[S.lbl, { left: 36, top: 164 }]}>SUPPLIER :</Text>
+            <Text style={[S.lbl, { left: 560, top: 176 }]}>MATERIAL :</Text>
 
             {/* Row 3: GROSS, DATE, TIME */}
-            <Text style={[S.lbl, { left: 36, top: 222 }]}>GROSS :</Text>
-            <Text style={[S.lbl, { left: 390, top: 222 }]}>DATE :</Text>
-            <Text style={[S.lbl, { left: 610, top: 222 }]}>TIME :</Text>
+            <Text style={[S.lbl, { left: 36, top: 204 }]}>GROSS :</Text>
+            <Text style={[S.lbl, { left: 330, top: 204 }]}>DATE :</Text>
+            <Text style={[S.lbl, { left: 560, top: 204 }]}>TIME :</Text>
 
             {/* Row 4: TARE, DATE, TIME */}
-            <Text style={[S.lbl, { left: 36, top: 264 }]}>TARE  :</Text>
-            <Text style={[S.lbl, { left: 390, top: 264 }]}>DATE :</Text>
-            <Text style={[S.lbl, { left: 610, top: 264 }]}>TIME :</Text>
+            <Text style={[S.lbl, { left: 36, top: 240 }]}>TARE  :</Text>
+            <Text style={[S.lbl, { left: 330, top: 240 }]}>DATE :</Text>
+            <Text style={[S.lbl, { left: 560, top: 240 }]}>TIME :</Text>
 
             {/* Row 5: NET */}
-            <Text style={[S.lbl, { left: 36, top: 306 }]}>NET   :</Text>
+            <Text style={[S.lbl, { left: 36, top: 276 }]}>NET   :</Text>
 
             {/* ---- Footer Section (Same Pink Background as Header) ---- */}
             {/* Gujarati conditions (exact text transcribed from scan), on a
@@ -352,23 +356,23 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
             <Text style={[S.valNarrow, { left: 680, top: 143, color: vColor }]}>{data.vehicleNo || ' '}</Text>
 
             {/* Row 2 Values */}
-            <Text style={[S.val, { left: 150, top: 176, color: vColor }]}>{supplierValue || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 164, color: vColor }]}>{data.material || ' '}</Text>
+            <Text style={[S.val, { left: 150, top: 164, color: vColor }]}>{supplierValue || ' '}</Text>
+            <Text style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Text>
 
             {/* Row 3 Values (GROSS) */}
-            <Text style={[S.val, WT, { top: 222, color: vColor }]}>{data.gross || ' '}</Text>
-            <Text style={[S.val, { left: 455, top: 222, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 222, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
+            <Text style={[S.val, WT, { top: 204, color: vColor }]}>{data.gross || ' '}</Text>
+            <Text style={[S.val, { left: 395, top: 204, color: vColor }]}>{fmtDate(data.grossDate) || ' '}</Text>
+            <Text style={[S.val, { left: 630, top: 204, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 4 Values (TARE) */}
-            <Text style={[S.val, WT, { top: 264, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, { left: 455, top: 264, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 264, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+            <Text style={[S.val, WT, { top: 240, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, { left: 395, top: 240, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
+            <Text style={[S.val, { left: 630, top: 240, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
             {/* Row 5 Values (NET & Charges) */}
-            <Text style={[S.val, WT, { top: 306, color: vColor }]}>{data.net || ' '}</Text>
+            <Text style={[S.val, WT, { top: 276, color: vColor }]}>{data.net || ' '}</Text>
             {data.charges ? (
-              <Text style={[S.val, { left: 550, top: 306, color: vColor }]}>
+              <Text style={[S.val, { left: 460, top: 276, color: vColor }]}>
                 {`Charges(Rs) :   ${data.charges}`}
               </Text>
             ) : null}

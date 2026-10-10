@@ -7,18 +7,22 @@ const INK = '#d0514f'          // Deep crimson/maroon press ink sampled from sca
 const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
 const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white background for center container
+// Masthead and the 100 / 5 MATRIC TON corner boxes share one brownish tone,
+// measured off the supplied title artwork — mirrors SIDE_TXT in the PDF slip.
+const SIDE_TXT = '#9a6f64'
 const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
 const PAGE_W = 850
 const PAGE_H = 458
 
 // Rendered width of the title lettering image (height follows its aspect)
-const TITLE_W = 560
+const TITLE_W = 615
 
 const GUJ = "'Noto Sans Gujarati', sans-serif"
 const SANS = 'Helvetica, Arial, sans-serif'
 const DOT = "'DotMatrix', monospace"
 
+// Mirrors lbl in the PDF slip.
 const lbl = {
   position: 'absolute',
   fontSize: 13.5,
@@ -46,7 +50,7 @@ const valNarrow = { ...val, fontSize: 9.5, letterSpacing: 0.2 }
 const noteRow = {
   position: 'absolute',
   left: 24,
-  fontSize: 11,
+  fontSize: 12.5,
   fontFamily: GUJ,
   fontWeight: 500,
   color: INK,
@@ -57,7 +61,7 @@ const noteRow = {
 // GROSS / TARE / NET share one right-aligned column ending at 375, so the
 // figures sit just left of "DATE :" (390) with a 15pt gap and their right
 // edges line up regardless of digit count. Mirrors WT in the PDF.
-const WT = { left: 150, width: 225, textAlign: 'right' }
+const WT = { left: 150, width: 165, textAlign: 'right' }
 
 // 'YYYY-MM-DD' -> 'DD/MM/YYYY'
 const fmtDate = (d) => (d && /^\d{4}-\d{2}-\d{2}$/.test(d) ? d.split('-').reverse().join('/') : d)
@@ -122,9 +126,9 @@ export default function JaySatyanarayanPreview({ data }) {
             boxSizing: 'border-box',
           }}
         >
-          <span style={{ fontSize: 38, fontWeight: 900, color: INK, lineHeight: 1 }}>100</span>
-          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 3, letterSpacing: 0.6 }}>MATRIC</span>
-          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
+          <span style={{ fontSize: 38, fontWeight: 900, color: SIDE_TXT, lineHeight: 1 }}>100</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: SIDE_TXT, marginTop: 3, letterSpacing: 0.6 }}>MATRIC</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: SIDE_TXT, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
         {/* Right Box: 5 MATRIC TON (same background as main background) */}
@@ -145,9 +149,9 @@ export default function JaySatyanarayanPreview({ data }) {
             boxSizing: 'border-box',
           }}
         >
-          <span style={{ fontSize: 42, fontWeight: 900, color: INK, lineHeight: 1 }}>5</span>
-          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 2, letterSpacing: 0.6 }}>MATRIC</span>
-          <span style={{ fontSize: 11.5, fontWeight: 900, color: INK, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
+          <span style={{ fontSize: 42, fontWeight: 900, color: SIDE_TXT, lineHeight: 1 }}>5</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: SIDE_TXT, marginTop: 2, letterSpacing: 0.6 }}>MATRIC</span>
+          <span style={{ fontSize: 11.5, fontWeight: 900, color: SIDE_TXT, marginTop: 1, letterSpacing: 0.6 }}>TON</span>
         </div>
 
         {/* Center Header Details */}
@@ -241,32 +245,32 @@ export default function JaySatyanarayanPreview({ data }) {
         <div style={{ ...valNarrow, left: 680, top: 143 }}>{data.vehicleNo || ''}</div>
 
         {/* Row 2: SUPPLIER & MATERIAL */}
-        <div style={{ ...lbl, left: 36, top: 176 }}>SUPPLIER :</div>
-        <div style={{ ...val, left: 150, top: 176 }}>{supplierValue || ''}</div>
-        <div style={{ ...lbl, left: 560, top: 164 }}>MATERIAL :</div>
-        <div style={{ ...val, left: 680, top: 164 }}>{data.material || ''}</div>
+        <div style={{ ...lbl, left: 36, top: 164 }}>SUPPLIER :</div>
+        <div style={{ ...val, left: 150, top: 164 }}>{supplierValue || ''}</div>
+        <div style={{ ...lbl, left: 560, top: 176 }}>MATERIAL :</div>
+        <div style={{ ...val, left: 680, top: 176 }}>{data.material || ''}</div>
 
         {/* Row 3: GROSS, DATE, TIME */}
-        <div style={{ ...lbl, left: 36, top: 222 }}>GROSS :</div>
-        <div style={{ ...val, ...WT, top: 222 }}>{data.gross || ''}</div>
-        <div style={{ ...lbl, left: 390, top: 222 }}>DATE :</div>
-        <div style={{ ...val, left: 455, top: 222 }}>{fmtDate(data.grossDate) || ''}</div>
-        <div style={{ ...lbl, left: 610, top: 222 }}>TIME :</div>
-        <div style={{ ...val, left: 680, top: 222 }}>{fmtTime(data.grossTime) || ''}</div>
+        <div style={{ ...lbl, left: 36, top: 204 }}>GROSS :</div>
+        <div style={{ ...val, ...WT, top: 204 }}>{data.gross || ''}</div>
+        <div style={{ ...lbl, left: 330, top: 204 }}>DATE :</div>
+        <div style={{ ...val, left: 395, top: 204 }}>{fmtDate(data.grossDate) || ''}</div>
+        <div style={{ ...lbl, left: 560, top: 204 }}>TIME :</div>
+        <div style={{ ...val, left: 630, top: 204 }}>{fmtTime(data.grossTime) || ''}</div>
 
         {/* Row 4: TARE, DATE, TIME */}
-        <div style={{ ...lbl, left: 36, top: 264 }}>TARE  :</div>
-        <div style={{ ...val, ...WT, top: 264 }}>{data.tare || ''}</div>
-        <div style={{ ...lbl, left: 390, top: 264 }}>DATE :</div>
-        <div style={{ ...val, left: 455, top: 264 }}>{fmtDate(data.tareDate) || ''}</div>
-        <div style={{ ...lbl, left: 610, top: 264 }}>TIME :</div>
-        <div style={{ ...val, left: 680, top: 264 }}>{fmtTime(data.tareTime) || ''}</div>
+        <div style={{ ...lbl, left: 36, top: 240 }}>TARE  :</div>
+        <div style={{ ...val, ...WT, top: 240 }}>{data.tare || ''}</div>
+        <div style={{ ...lbl, left: 330, top: 240 }}>DATE :</div>
+        <div style={{ ...val, left: 395, top: 240 }}>{fmtDate(data.tareDate) || ''}</div>
+        <div style={{ ...lbl, left: 560, top: 240 }}>TIME :</div>
+        <div style={{ ...val, left: 630, top: 240 }}>{fmtTime(data.tareTime) || ''}</div>
 
         {/* Row 5: NET & Charges */}
-        <div style={{ ...lbl, left: 36, top: 306 }}>NET   :</div>
-        <div style={{ ...val, ...WT, top: 306 }}>{data.net || ''}</div>
+        <div style={{ ...lbl, left: 36, top: 276 }}>NET   :</div>
+        <div style={{ ...val, ...WT, top: 276 }}>{data.net || ''}</div>
         {data.charges ? (
-          <div style={{ ...val, left: 550, top: 306 }}>
+          <div style={{ ...val, left: 460, top: 276 }}>
             {`Charges(Rs) :   ${data.charges}`}
           </div>
         ) : null}

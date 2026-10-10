@@ -5,9 +5,9 @@ import PrintPage from './printSpec.jsx'
 import jaySatyanarayanTitle, { jaySatyanarayanTitleAspect } from '../jaySatyanarayanTitle.js'
 
 // Color palette matched from jay satyanarayan.jpeg scan
-const INK = '#982435'          // Deep crimson red press ink
-const HEADER_BG = '#f0bcc5'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f0bcc5'    // Soft dusty pink screened tint for footer band
+const INK = '#d0514f'          // Deep crimson red press ink
+const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white continuous paper for center container
 const VAL = '#1a1a1a'          // Dark charcoal for values
 
@@ -86,7 +86,8 @@ const S = StyleSheet.create({
     objectFit: 'contain',
   },
   address1: {
-    fontSize: 11,
+    lineHeight: 1,
+    fontSize: 13.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -94,7 +95,8 @@ const S = StyleSheet.create({
     letterSpacing: 0.2,
   },
   address2: {
-    fontSize: 10.5,
+    lineHeight: 1,
+    fontSize: 13,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -102,11 +104,12 @@ const S = StyleSheet.create({
     letterSpacing: 0.2,
   },
   subTitle: {
-    fontSize: 13.5,
+    lineHeight: 1,
+    fontSize: 15.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 11,
     letterSpacing: 1.2,
   },
 
@@ -161,11 +164,10 @@ const S = StyleSheet.create({
     color: INK,
     lineHeight: 1.2,
   },
-
   opSig: {
     position: 'absolute',
     left: 540,
-    top: 412,
+    top: 424,
     fontSize: 12.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
@@ -291,7 +293,7 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
 
             {/* Row 2: SUPPLIER & MATERIAL */}
             <Text style={[S.lbl, { left: 36, top: 176 }]}>SUPPLIER :</Text>
-            <Text style={[S.lbl, { left: 560, top: 176 }]}>MATERIAL :</Text>
+            <Text style={[S.lbl, { left: 560, top: 164 }]}>MATERIAL :</Text>
 
             {/* Row 3: GROSS, DATE, TIME */}
             <Text style={[S.lbl, { left: 36, top: 222 }]}>GROSS :</Text>
@@ -307,20 +309,23 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
             <Text style={[S.lbl, { left: 36, top: 306 }]}>NET   :</Text>
 
             {/* ---- Footer Section (Same Pink Background as Header) ---- */}
-            {/* Gujarati conditions (exact text transcribed from scan) */}
-            <View style={[S.noteRow, { top: 355 }]}>
+            {/* Gujarati conditions (exact text transcribed from scan), on a
+                15pt grid pushed down toward the bottom border — keep in step
+                with JaySatyanarayanPreview.jsx. */}
+            <View style={[S.noteRow, { top: 368 }]}>
               <Text style={S.gujText}>* વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</Text>
             </View>
-            <View style={[S.noteRow, { top: 370 }]}>
+            <View style={[S.noteRow, { top: 383 }]}>
               <Text style={S.gujText}>* વજન થઈ ગયા પછી અમારી કોઈ પણ જાતની જવાબદારી રહેતી નથી.</Text>
             </View>
-            <View style={[S.noteRow, { top: 385 }]}>
+            <View style={[S.noteRow, { top: 398 }]}>
               <Text style={S.gujText}>* ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતું નથી.</Text>
             </View>
-            <View style={[S.noteRow, { top: 400 }]}>
+            <View style={[S.noteRow, { top: 413 }]}>
               <Text style={S.gujText}>* ગાડીનું ખાલી તથા ભરેલું વજન ૨૪ કલાકની અંદર કરાવી લેવું.</Text>
             </View>
-            <View style={[S.noteRow, { top: 415 }]}>
+            {/* Jurisdiction is the LAST line, below all four Gujarati notes. */}
+            <View style={[S.noteRow, { top: 428 }]}>
               <Text style={S.jurisdictionText}>* Subject to Rajkot Jurisdiction</Text>
             </View>
 
@@ -348,7 +353,7 @@ export default function JaySatyanarayanSlip({ data, mode = 'full', offsetX = 0, 
 
             {/* Row 2 Values */}
             <Text style={[S.val, { left: 150, top: 176, color: vColor }]}>{supplierValue || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Text>
+            <Text style={[S.val, { left: 680, top: 164, color: vColor }]}>{data.material || ' '}</Text>
 
             {/* Row 3 Values (GROSS) */}
             <Text style={[S.val, WT, { top: 222, color: vColor }]}>{data.gross || ' '}</Text>

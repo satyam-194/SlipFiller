@@ -3,9 +3,9 @@ import SlipScaler from './SlipScaler.jsx'
 import jaySatyanarayanTitle, { jaySatyanarayanTitleAspect } from './jaySatyanarayanTitle.js'
 
 // Color palette matched from jay satyanarayan.jpeg
-const INK = '#982435'          // Deep crimson/maroon press ink sampled from scan
-const HEADER_BG = '#f0bcc5'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f0bcc5'    // Soft dusty pink screened tint for footer band
+const INK = '#d0514f'          // Deep crimson/maroon press ink sampled from scan
+const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white background for center container
 const VAL = '#1a1a1a'          // Dark charcoal for dot-matrix values
 
@@ -40,6 +40,19 @@ const val = {
 }
 // Condensed pitch (17 CPI) — mirrors the matching valNarrow in the PDF
 const valNarrow = { ...val, fontSize: 9.5, letterSpacing: 0.2 }
+
+// Footer note row — mirrors noteRow + gujText in the PDF slip, including its
+// lineHeight, so the two render the text block identically.
+const noteRow = {
+  position: 'absolute',
+  left: 24,
+  fontSize: 11,
+  fontFamily: GUJ,
+  fontWeight: 500,
+  color: INK,
+  lineHeight: 1.2,
+  whiteSpace: 'nowrap',
+}
 
 // GROSS / TARE / NET share one right-aligned column ending at 375, so the
 // figures sit just left of "DATE :" (390) with a 15pt gap and their right
@@ -162,11 +175,12 @@ export default function JaySatyanarayanPreview({ data }) {
           />
           <div
             style={{
-              fontSize: 11,
+              fontSize: 13.5,
               fontWeight: 700,
               fontFamily: SANS,
               color: INK,
               textAlign: 'center',
+              lineHeight: 1,
               marginTop: 4,
               letterSpacing: 0.2,
               whiteSpace: 'nowrap',
@@ -176,11 +190,12 @@ export default function JaySatyanarayanPreview({ data }) {
           </div>
           <div
             style={{
-              fontSize: 10.5,
+              fontSize: 13,
               fontWeight: 700,
               fontFamily: SANS,
               color: INK,
               textAlign: 'center',
+              lineHeight: 1,
               marginTop: 2,
               letterSpacing: 0.2,
               whiteSpace: 'nowrap',
@@ -190,12 +205,13 @@ export default function JaySatyanarayanPreview({ data }) {
           </div>
           <div
             style={{
-              fontSize: 13.5,
+              fontSize: 15.5,
               fontWeight: 800,
               fontFamily: SANS,
               color: INK,
               textAlign: 'center',
-              marginTop: 4,
+              lineHeight: 1,
+              marginTop: 11,
               letterSpacing: 1.2,
               whiteSpace: 'nowrap',
             }}
@@ -227,8 +243,8 @@ export default function JaySatyanarayanPreview({ data }) {
         {/* Row 2: SUPPLIER & MATERIAL */}
         <div style={{ ...lbl, left: 36, top: 176 }}>SUPPLIER :</div>
         <div style={{ ...val, left: 150, top: 176 }}>{supplierValue || ''}</div>
-        <div style={{ ...lbl, left: 560, top: 176 }}>MATERIAL :</div>
-        <div style={{ ...val, left: 680, top: 176 }}>{data.material || ''}</div>
+        <div style={{ ...lbl, left: 560, top: 164 }}>MATERIAL :</div>
+        <div style={{ ...val, left: 680, top: 164 }}>{data.material || ''}</div>
 
         {/* Row 3: GROSS, DATE, TIME */}
         <div style={{ ...lbl, left: 36, top: 222 }}>GROSS :</div>
@@ -256,23 +272,25 @@ export default function JaySatyanarayanPreview({ data }) {
         ) : null}
 
         {/* ---- Footer Section (Same Pink Background Color as Header) ---- */}
-        {/* Gujarati Conditions (5 bullets) */}
-        <div style={{ position: 'absolute', left: 24, top: 355, display: 'flex', flexDirection: 'column', gap: 1 }}>
-          <span style={{ fontSize: 11, fontFamily: GUJ, fontWeight: 500, color: INK, whiteSpace: 'nowrap' }}>
-            * વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.
-          </span>
-          <span style={{ fontSize: 11, fontFamily: GUJ, fontWeight: 500, color: INK, whiteSpace: 'nowrap' }}>
-            * વજન થઈ ગયા પછી અમારી કોઈ પણ જાતની જવાબદારી રહેતી નથી.
-          </span>
-          <span style={{ fontSize: 11, fontFamily: GUJ, fontWeight: 500, color: INK, whiteSpace: 'nowrap' }}>
-            * ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતું નથી.
-          </span>
-          <span style={{ fontSize: 11, fontFamily: GUJ, fontWeight: 500, color: INK, whiteSpace: 'nowrap' }}>
-            * ગાડીનું ખાલી તથા ભરેલું વજન ૨૪ કલાકની અંદર કરાવી લેવું.
-          </span>
-          <span style={{ fontSize: 11, fontFamily: SANS, fontWeight: 700, color: INK, whiteSpace: 'nowrap' }}>
-            * Subject to Rajkot Jurisdiction
-          </span>
+        {/* Gujarati Conditions (4 bullets) + jurisdiction as the LAST line.
+            Each row is absolutely placed on the SAME 15pt grid the PDF slip
+            uses (y=368..428). A flex column was used here before, but its
+            rows resolved lower than the PDF's, so preview and print
+            disagreed. Absolute tops cannot drift apart. */}
+        <div style={{ ...noteRow, top: 368 }}>
+          * વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.
+        </div>
+        <div style={{ ...noteRow, top: 383 }}>
+          * વજન થઈ ગયા પછી અમારી કોઈ પણ જાતની જવાબદારી રહેતી નથી.
+        </div>
+        <div style={{ ...noteRow, top: 398 }}>
+          * ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતું નથી.
+        </div>
+        <div style={{ ...noteRow, top: 413 }}>
+          * ગાડીનું ખાલી તથા ભરેલું વજન ૨૪ કલાકની અંદર કરાવી લેવું.
+        </div>
+        <div style={{ ...noteRow, fontFamily: SANS, fontWeight: 700, top: 428 }}>
+          * Subject to Rajkot Jurisdiction
         </div>
 
         {/* Operator Signature */}
@@ -280,7 +298,7 @@ export default function JaySatyanarayanPreview({ data }) {
           style={{
             position: 'absolute',
             left: 540,
-            top: 412,
+            top: 424,
             fontSize: 12.5,
             fontWeight: 700,
             fontFamily: SANS,

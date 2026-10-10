@@ -5,9 +5,9 @@ import PrintPage from './printSpec.jsx'
 import satyanarayanTitle, { satyanarayanTitleAspect } from '../satyanarayanTitle.js'
 
 // Color palette matched from satyanarayan.jpeg scan
-const INK = '#c25560'          // Light red press ink sampled from slip photo
-const HEADER_BG = '#f4c8d0'    // Soft dusty pink screened tint for header band & slip body
-const FOOTER_BG = '#f4c8d0'    // Soft dusty pink screened tint for footer band
+const INK = '#d0514f'          // Light red press ink sampled from slip photo
+const HEADER_BG = '#f5c5c2'    // Soft dusty pink screened tint for header band & slip body
+const FOOTER_BG = '#f5c5c2'    // Soft dusty pink screened tint for footer band
 const PAPER = '#ffffff'        // Pure white continuous paper for center container
 const VAL = '#1a1a1a'          // Dark charcoal for values
 
@@ -86,7 +86,8 @@ const S = StyleSheet.create({
     objectFit: 'contain',
   },
   address1: {
-    fontSize: 12,
+    lineHeight: 1,
+    fontSize: 13.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -94,7 +95,8 @@ const S = StyleSheet.create({
     letterSpacing: 0.2,
   },
   address2: {
-    fontSize: 11.5,
+    lineHeight: 1,
+    fontSize: 13,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
@@ -102,11 +104,12 @@ const S = StyleSheet.create({
     letterSpacing: 0.2,
   },
   subTitle: {
-    fontSize: 13.5,
+    lineHeight: 1,
+    fontSize: 15.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
     textAlign: 'center',
-    marginTop: 4,
+    marginTop: 12,
     letterSpacing: 1.2,
   },
 
@@ -161,11 +164,10 @@ const S = StyleSheet.create({
     color: INK,
     lineHeight: 1.2,
   },
-
   opSig: {
     position: 'absolute',
     left: 540,
-    bottom: 20,
+    top: 424,
     fontSize: 12.5,
     fontFamily: 'Helvetica-Bold',
     color: INK,
@@ -281,43 +283,49 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
 
             {/* ---- Middle Fields Labels ---- */}
             {/* Row 1: RST NO. & VEHICLE NO. */}
-            <Text style={[S.lbl, { left: 36, top: 140 }]}>RST NO.  :</Text>
-            <Text style={[S.lbl, { left: 540, top: 140 }]}>VEHICLE NO. :</Text>
+            <Text style={[S.lbl, { left: 36, top: 150 }]}>RST NO.  :</Text>
+            <Text style={[S.lbl, { left: 540, top: 158 }]}>VEHICLE NO. :</Text>
 
-            {/* Row 2: SUPPLIER & MATERIAL */}
+            {/* Row 2: SUPPLIER & MATERIAL. Pulled up close to RST NO. above,
+                as on the original — the two identity rows sit as a pair,
+                separated from the weigh rows below. */}
             <Text style={[S.lbl, { left: 36, top: 176 }]}>SUPPLIER :</Text>
-            <Text style={[S.lbl, { left: 560, top: 176 }]}>MATERIAL :</Text>
+            <Text style={[S.lbl, { left: 560, top: 184 }]}>MATERIAL :</Text>
 
+            {/* Rows 3-5: the weigh rows, on a tighter 36pt pitch (was 42). */}
             {/* Row 3: GROSS, DATE, TIME */}
             <Text style={[S.lbl, { left: 36, top: 222 }]}>GROSS :</Text>
             <Text style={[S.lbl, { left: 345, top: 222 }]}>DATE :</Text>
             <Text style={[S.lbl, { left: 610, top: 222 }]}>TIME :</Text>
 
             {/* Row 4: TARE, DATE, TIME */}
-            <Text style={[S.lbl, { left: 36, top: 264 }]}>TARE  :</Text>
-            <Text style={[S.lbl, { left: 345, top: 264 }]}>DATE :</Text>
-            <Text style={[S.lbl, { left: 610, top: 264 }]}>TIME :</Text>
+            <Text style={[S.lbl, { left: 36, top: 258 }]}>TARE  :</Text>
+            <Text style={[S.lbl, { left: 345, top: 258 }]}>DATE :</Text>
+            <Text style={[S.lbl, { left: 610, top: 258 }]}>TIME :</Text>
 
-            {/* Row 5: NET */}
-            <Text style={[S.lbl, { left: 36, top: 306 }]}>NET   :</Text>
+            {/* Row 5: NET. On the original "Charges(Rs): 60" is NOT
+                pre-printed — the machine types the whole thing in dot-matrix
+                on the white area, so it lives in the values layer below. */}
+            <Text style={[S.lbl, { left: 36, top: 294 }]}>NET   :</Text>
 
             {/* ---- Footer Section (Same Pink Background as Header) ---- */}
-            {/* Gujarati conditions (exact text transcribed from scan) */}
-            {/* Pinned to the bottom border (inner edge y=444) with ~6px
-                padding — keep in step with SatyanarayanPreview.jsx. */}
-            <View style={[S.noteRow, { bottom: 20 }]}>
+            {/* Gujarati conditions (exact text transcribed from scan), on a
+                15pt grid pushed down toward the bottom border — keep in step
+                with SatyanarayanPreview.jsx. */}
+            <View style={[S.noteRow, { top: 364 }]}>
               <Text style={S.gujText}>* વજન કરતી વખતે પાર્ટીએ પોતાના જવાબદાર માણસને ગાડી સાથે મોકલી વજન તપાસી લેવું.</Text>
             </View>
-            <View style={[S.noteRow, { top: 370 }]}>
+            <View style={[S.noteRow, { top: 379 }]}>
               <Text style={S.gujText}>* વજન થઈ ગયા પછી અમારી કોઈ પણ જાતની જવાબદારી રહેતી નથી.</Text>
             </View>
-            <View style={[S.noteRow, { top: 385 }]}>
+            <View style={[S.noteRow, { top: 394 }]}>
               <Text style={S.gujText}>* ગાડીની અંદર શું માલ છે તે તપાસવામાં આવતું નથી.</Text>
             </View>
-            <View style={[S.noteRow, { top: 400 }]}>
+            <View style={[S.noteRow, { top: 409 }]}>
               <Text style={S.gujText}>* ગાડીનું ખાલી તથા ભરેલું વજન ૨૪ કલાકની અંદર કરાવી લેવું.</Text>
             </View>
-            <View style={[S.noteRow, { top: 415 }]}>
+            {/* Jurisdiction is the LAST line, below all four Gujarati notes. */}
+            <View style={[S.noteRow, { top: 424 }]}>
               <Text style={S.jurisdictionText}>* Subject to Rajkot Jurisdiction</Text>
             </View>
 
@@ -340,12 +348,12 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
         {showValues && (
           <View style={{ position: 'absolute', left: offsetX, top: offsetY, width: PAGE_W, height: PAGE_H }}>
             {/* Row 1 Values */}
-            <Text style={[S.val, { left: 150, top: 140, color: vColor }]}>{data.serialNo || ' '}</Text>
-            <Text style={[S.valNarrow, { left: 680, top: 143, color: vColor }]}>{data.vehicleNo || ' '}</Text>
+            <Text style={[S.val, { left: 150, top: 150, color: vColor }]}>{data.serialNo || ' '}</Text>
+            <Text style={[S.valNarrow, { left: 680, top: 161, color: vColor }]}>{data.vehicleNo || ' '}</Text>
 
             {/* Row 2 Values */}
             <Text style={[S.val, { left: 150, top: 176, color: vColor }]}>{supplierValue || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 176, color: vColor }]}>{data.material || ' '}</Text>
+            <Text style={[S.val, { left: 680, top: 184, color: vColor }]}>{data.material || ' '}</Text>
 
             {/* Row 3 Values (GROSS) */}
             <Text style={[S.val, WT, { top: 222, color: vColor }]}>{data.gross || ' '}</Text>
@@ -353,15 +361,16 @@ export default function SatyanarayanSlip({ data, mode = 'full', offsetX = 0, off
             <Text style={[S.val, { left: 680, top: 222, color: vColor }]}>{fmtTime(data.grossTime) || ' '}</Text>
 
             {/* Row 4 Values (TARE) */}
-            <Text style={[S.val, WT, { top: 264, color: vColor }]}>{data.tare || ' '}</Text>
-            <Text style={[S.val, { left: 455, top: 264, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
-            <Text style={[S.val, { left: 680, top: 264, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
+            <Text style={[S.val, WT, { top: 258, color: vColor }]}>{data.tare || ' '}</Text>
+            <Text style={[S.val, { left: 455, top: 258, color: vColor }]}>{fmtDate(data.tareDate) || ' '}</Text>
+            <Text style={[S.val, { left: 680, top: 258, color: vColor }]}>{fmtTime(data.tareTime) || ' '}</Text>
 
-            {/* Row 5 Values (NET & Charges) */}
-            <Text style={[S.val, WT, { top: 306, color: vColor }]}>{data.net || ' '}</Text>
+            {/* Row 5 Values (NET & Charges) — the whole "Charges(Rs):  60" is
+                machine-typed on the original, label included. */}
+            <Text style={[S.val, WT, { top: 294, color: vColor }]}>{data.net || ' '}</Text>
             {data.charges ? (
-              <Text style={[S.val, { left: 550, top: 306, color: vColor }]}>
-                {`Charges(Rs) :   ${data.charges}`}
+              <Text style={[S.val, { left: 540, top: 294, color: vColor }]}>
+                {`Charges(Rs):  ${data.charges}`}
               </Text>
             ) : null}
           </View>
